@@ -1,0 +1,109 @@
+weather-system/
+│
+├── public/                     # Entry point (Views only)
+│   ├── index.php
+│   ├── subscribe.php
+│   ├── dashboard.php
+│   ├── assets/
+│   │   ├── css/
+│   │   │   └── style.css
+│   │   └── js/
+│   │       └── subscribe.js
+│
+├── app/
+│   ├── config/
+│   │   ├── config.php
+│   │   ├── db.php
+│   │   └── mail.php
+│   │
+│   ├── controllers/
+│   │   ├── SubscriptionController.php
+│   │   ├── DashboardController.php
+│   │   ├── CronController.php
+│   │   └── PaymentController.php
+│   │
+│   ├── models/
+│   │   ├── User.php
+│   │   ├── Subscription.php
+│   │   ├── WeatherLog.php
+│   │   ├── Notification.php
+│   │   └── Payment.php
+│   │
+│   ├── services/
+│   │   ├── WeatherService.php
+│   │   └── MailService.php
+│   │
+│   ├── views/
+│   │   ├── layouts/
+│   │   │   ├── header.php
+│   │   │   └── footer.php
+│   │   ├── subscription/
+│   │   │   └── form.php
+│   │   ├── dashboard/
+│   │   │   └── index.php
+│   │   └── emails/
+│   │       └── weather_alert.php
+│   │
+│   └── cron/
+│       └── check_weather.php
+│
+├── logs/
+│   ├── api.log
+│   ├── cron.log
+│   └── email.log
+│
+├── sql/
+│   └── schema.sql
+│
+└── README.md
+┌───────────────┐
+│   User Opens  │
+│  subscribe.php│
+└───────┬───────┘
+        │
+        ▼
+┌────────────────────┐
+│  User Fills Form   │
+│ Email, City,       │
+│ Condition,         │
+│ Threshold           │
+└───────┬────────────┘
+        │
+        ▼
+┌────────────────────┐
+│ Client-Side Check  │
+│ (JavaScript)       │
+│ • Empty fields?    │
+│ • Email format?    │
+│ • Threshold valid? │
+└───────┬────────────┘
+        │
+   ❌ Invalid        ✅ Valid
+        │             │
+        ▼             ▼
+┌─────────────────┐   ┌──────────────────────┐
+│ Show Error Msg  │   │ Submit Form (POST)   │
+│ on Browser     │   │ to Server             │
+└─────────────────┘   └───────────┬──────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────┐
+│ Server-Side Validation (PHP)    │
+│ • Sanitize input                │
+│ • Validate email, city          │
+│ • Validate condition & threshold│
+└───────────┬─────────────────────┘
+        ❌ Invalid            ✅ Valid
+           │                   │
+           ▼                   ▼
+┌─────────────────────┐   ┌────────────────────────┐
+│ Return Error Msg    │   │ Database Operations     │
+│ to User             │   │ • Insert / fetch user   │
+└─────────────────────┘   │ • Insert subscription   │
+                            └───────────┬───────────┘
+                                        │
+                                        ▼
+┌────────────────────────────┐
+│ Subscription Success       │
+│ Confirmation shown to user │
+└────────────────────────────┘

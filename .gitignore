@@ -1,0 +1,12 @@
+# Environment & secrets
+.env
+app/config/config.php
+app/config/db.php
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

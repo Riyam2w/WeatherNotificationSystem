@@ -1,0 +1,89 @@
+body {
+    margin: 0;
+    font-family: Inter, sans-serif;
+    background: #f5f7fb;
+}
+
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-card {
+    background: #fff;
+    width: 380px;
+    padding: 50px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    text-align: center;
+}
+
+.logo {
+    color: #1a73e8;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.field {
+    text-align: left;
+    margin-bottom: 16px;
+}
+
+.field label {
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.field input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.primary-btn {
+    width: 100%;
+    padding: 12px;
+    background: #1a73e8;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.divider {
+    margin: 18px 0;
+    color: #aaa;
+    font-size: 13px;
+}
+
+.google-btn {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.footer-text {
+    margin-top: 16px;
+    font-size: 13px;
+}
+
+.error-box {
+    background: #ffecec;
+    color: #c00;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}

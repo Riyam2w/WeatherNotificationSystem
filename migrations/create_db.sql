@@ -1,0 +1,3 @@
+CREATE DATABASE weather_notification_system;
+
+USE weather_notification_system;
