@@ -1,28 +1,29 @@
-<?php 
+<?php
 declare(strict_types=1);
-class Subscription {
+
+class Subscription
+{
     private mysqli $conn;
+
     public function __construct(mysqli $conn)
     {
         $this->conn = $conn;
     }
-    public function create(array $data): bool {
-        $sql = "insert into subscriptions(user_id, city, condition_type, condition_operator, condition_value, is_active, valid_from, created_at) values(?, ?, ?, ?, ?, 1, now(), now())";
 
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param(
-            "isssd",
-            $data['user_id'],
-            $data['city'],
-            $data['condition_type'],
-            $data['condition_operator'],
-            $data['condition_value']
+    public function current(int $userId): ?array
+    {
+        $stmt = $this->conn->prepare(
+            "SELECT *
+             FROM subscriptions
+             WHERE user_id = ?
+             AND is_active = 1
+             AND CURDATE() BETWEEN valid_from AND valid_till
+             ORDER BY valid_till DESC
+             LIMIT 1"
         );
-        return $stmt->execute();
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+
+        return $stmt->get_result()->fetch_assoc() ?: null;
     }
-
 }
-
-
-
-?>

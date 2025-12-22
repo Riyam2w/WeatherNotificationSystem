@@ -1,49 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Alerts</title>
-    <link rel="stylesheet" href="/public/assets/css/auth.css">
+    <title>WeatherNotify</title>
+    <link rel="stylesheet" href="/assets/css/auth.css">
+     <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
 </head>
 <body>
-    <div class="auth-wrapper">
-        <div class="auth-card">
-            <h2 class="logo">Weather Alerts</h2>
-            <h1>Create your account</h1>
-               <p class="subtitle">Start receiving real-time weather alerts today.</p>
 
-               <?php if(!empty($errors)): ?>
-                    <div class="error-box">
-                        <?php foreach ($errors as $e): ?>
-                            <p><?= htmlspecialchars($e) ?></p>
-                        <?php endforeach; ?>
-                    </div>
-               <?php endif; ?>
-     
-               <form action="/register" method="post" novalidate>
-                    <div class="field">
-                        <label>Email Address</label> 
-                        <input type= "email" name="email" placeholder="Enter your email" required>
-                    </div>
-                
-                    <div class="field">
-                        <label>Password</label>
-                        <input type="password" name="password" placeholder="Enter your password" required>
-                    </div>
+<!-- <header class="navbar">
+    <div class="logo">🌩 WeatherNotify</div>
+    <nav>
+        <a href="/home">Home</a>
+        <a href="/features">Features</a>
+        <a href="/pricing">Pricing</a>
+        <a class="btn" href="/login">Log In</a>
+    </nav>
+</header> -->
 
-                    <div class="field">
-                        <label>Confirm Password</label>
-                        <input type="password" name="confirm_password" placeholder="Confirm your password" required>
-                    </div>
-                    <button>Register</button>
-                    <!-- continue with google button -->
+<main class="container">
+    <section class="hero">
+        <h1>Never get caught<br>in the rain again.</h1>
+        <p>Real-time alerts, custom triggers, and severe weather warnings.</p>
+        <div class="alert-box">⚠ Severe Thunderstorm Warning</div>
+    </section>
 
-                    <p class="footer-text">
-                        Already have an aacount? <a href="/login">Log In</a>
-                    </p>
-                </form>
-        </div>  
-    </div>
+    <section class="card">
+        <h2>Create Account</h2>
+
+        <?php if (!empty($errors)): ?>
+            <div class="error">
+                <?php foreach ($errors as $e): ?>
+                    <p><?= htmlspecialchars($e) ?></p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <form method="post" id="registerForm" action="/register">
+
+            <label>Full Name</label>
+            <input type="text" name="full_name" placeholder="Enter your                                                                                                                                                            full name" required>
+
+            <label>Email Address</label>
+            <input type="email" name="email" placeholder="enter your email address" required>
+
+            <label>Password</label>
+            <div class="password">
+            <input type="password" name="password" id="password-field"  placeholder="enter password" required>
+            <span class="fa fa-eye-slash toggle-password" id="togglePassword"></span>
+            </div>
+            <label>Confirm Password</label>
+           <div class="password">
+           <input type="password" name="confirm_password" id="confirm-password-field" placeholder="confirm password" required>
+           <span class="fa fa-eye-slash toggle-password" id="toggleConfirmPassword"></span>
+           </div>
+
+
+            <!-- <label class="checkbox">
+                <input type="checkbox" required>
+                I agree to the Terms & Privacy Policy
+            </label> -->
+
+            <button type="submit">Create Account</button>
+
+            <p class="switch">Already a member? <a href="/login">Log In</a></p>
+        </form>
+    </section>
+</main>
+
+<script src="/assets/js/register.js"></script>
 </body>
 </html>

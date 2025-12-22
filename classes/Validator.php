@@ -3,7 +3,6 @@ declare(strict_types=1);
 final class Validator {
     public static function email(string $email): bool {
         $email = trim($email);
-
         if($email == '') {
             return false;
         }

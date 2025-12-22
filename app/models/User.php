@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 class User
 {
     private mysqli $conn;
@@ -13,23 +11,25 @@ class User
     public function emailExists(string $email): bool
     {
         $stmt = $this->conn->prepare(
-            "SELECT id FROM users WHERE email = ? LIMIT 1"
+            "SELECT id FROM users WHERE email = ?"
         );
         $stmt->bind_param("s", $email);
         $stmt->execute();
+        $stmt->store_result();
 
-        return (bool) $stmt->get_result()->fetch_assoc();
+        return $stmt->num_rows > 0;
     }
 
-    public function create(string $fullName, string $email, string $passwordHash): void
-{
-    $stmt = $this->conn->prepare(
-        "INSERT INTO users (full_name, email, password_hash)
-         VALUES (?, ?, ?)"
-    );
+    public function create(string $name, string $email, string $password): bool
+    {
+        $hash = password_hash($password, PASSWORD_DEFAULT);
 
-    $stmt->bind_param("sss", $fullName, $email, $passwordHash);
-    $stmt->execute();
-}
+        $stmt = $this->conn->prepare(
+            "INSERT INTO users (full_name, email, password)
+             VALUES (?, ?, ?)"
+        );
+        $stmt->bind_param("sss", $name, $email, $hash);
 
+        return $stmt->execute();
+    }
 }
