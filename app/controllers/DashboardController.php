@@ -1,41 +1,66 @@
 <?php
-
 declare(strict_types=1);
 
-class DashboardController extends Controller {
-     private mysqli $conn;
+class DashboardController extends Controller
+{
+    private mysqli $conn;
 
     public function __construct(mysqli $conn)
     {
         $this->conn = $conn;
-    } 
-
-public function index(): void
-{
-    Auth::requireLogin();
-
-    $userId = Auth::id();
-
-    $alertModel = new Alert($this->conn);
-    $subModel   = new Subscription($this->conn);
-    $history    = new AlertHistory($this->conn);
-
-    // ✅ GET USER HERE (NOT IN VIEW)
-    $user = Auth::user($this->conn);
-
-    $this->view('dashboard/index', [
-        'user' => $user,
-        'stats' => [
-            'cities' => $alertModel->countCities($userId),
-            'active' => $alertModel->countActive($userId),
-            'today'  => $history->countToday($userId),
-            'last'   => $history->lastSentTime($userId),
-        ],
-        'subscription' => $subModel->current($userId),
-        'alerts'       => $alertModel->all($userId),
-        'history'      => $history->recent($userId),
-    ]);
-}
-
     }
+
+    public function index(string $page = 'overview'): void
+    {
+        // USER
+        $userName = $_SESSION['full_name'] ?? 'User';
+
+        // PLAN (temporary – replace with DB later)
+        $plan = [
+            'name'   => 'Free Plan',
+            'status' => 'active',
+            'expiry' => 'Never',
+        ];
+
+        // STATS (temporary)
+        $stats = [
+            'cities_count'     => 2,
+            'active_alerts'    => 3,
+            'triggered_today'  => 1,
+            'last_alert_time'  => 'Today, 10:30 AM',
+        ];
+
+        // ALERTS (temporary)
+        $alerts = [
+            [
+                'city'      => 'Delhi',
+                'condition' => 'Temp > 40°C',
+                'status'    => 'active',
+            ],
+            [
+                'city'      => 'Mumbai',
+                'condition' => 'Rain',
+                'status'    => 'paused',
+            ],
+        ];
+
+        // HISTORY (temporary)
+        $history = [
+            [
+                'time'   => '2025-01-22 09:15',
+                'city'   => 'Delhi',
+                'event'  => 'Temperature crossed 40°C',
+                'status' => 'sent',
+            ],
+        ];
+
+        $this->view('dashboard/overview', compact(
+            'userName',
+            'plan',
+            'stats',
+            'alerts',
+            'history'
+        ));
+    }
+}
 

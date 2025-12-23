@@ -1,31 +1,24 @@
-$(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-    // Password toggle
-    $("#togglePassword").click(function () {
-        const input = $("#password-field");
+    function togglePassword(fieldId, toggleId) {
+        const field = document.getElementById(fieldId);
+        const toggle = document.getElementById(toggleId);
 
-        if (input.attr("type") === "password") {
-            // Show password
-            input.attr("type", "text");
-            $(this).removeClass("fa-eye-slash").addClass("fa-eye");
-        } else {
-            // Hide password
-            input.attr("type", "password");
-            $(this).removeClass("fa-eye").addClass("fa-eye-slash");
-        }
-    });
+        if (!field || !toggle) return;
 
-    // Confirm password toggle
-    $("#toggleConfirmPassword").click(function () {
-        const input = $("#confirm-password-field");
+        toggle.addEventListener("click", function () {
+            const isPassword = field.type === "password";
+            field.type = isPassword ? "text" : "password";
 
-        if (input.attr("type") === "password") {
-            input.attr("type", "text");
-            $(this).removeClass("fa-eye-slash").addClass("fa-eye");
-        } else {
-            input.attr("type", "password");
-            $(this).removeClass("fa-eye").addClass("fa-eye-slash");
-        }
-    });
+            toggle.classList.toggle("fa-eye");
+            toggle.classList.toggle("fa-eye-slash");
+        });
+    }
+
+    // Password field
+    togglePassword("password-field", "togglePassword");
+
+    // Confirm password field
+    togglePassword("confirm-password-field", "toggleConfirmPassword");
 
 });

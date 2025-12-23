@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>WeatherNotify</title>
+    <title>WeatherNotify | Register</title>
+
+    <!-- Shared Auth CSS -->
     <link rel="stylesheet" href="/assets/css/auth.css">
-     <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-
+    <!-- Font Awesome for eye icons -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-<body>
 
-<!-- <header class="navbar">
-    <div class="logo">🌩 WeatherNotify</div>
-    <nav>
-        <a href="/home">Home</a>
-        <a href="/features">Features</a>
-        <a href="/pricing">Pricing</a>
-        <a class="btn" href="/login">Log In</a>
-    </nav>
-</header> -->
+<body class="auth register-page">
 
 <main class="container">
+
+    <!-- LEFT HERO (same as login) -->
     <section class="hero">
-        <h1>Never get caught<br>in the rain again.</h1>
-        <p>Real-time alerts, custom triggers, and severe weather warnings.</p>
-        <div class="alert-box">⚠ Severe Thunderstorm Warning</div>
+        <div class="logo">🌩 WeatherNotify</div>
+
+        <h1>Monitor the skies<br>with precision.</h1>
+        <p>
+            Real-time alerts and detailed forecasts to keep you one
+            step ahead of the storm.
+        </p>
     </section>
 
+    <!-- RIGHT CARD -->
     <section class="card">
-        <h2>Create Account</h2>
+        <h2>Create your account</h2>
+        <p>Start receiving real-time weather alerts today.</p>
 
         <?php if (!empty($errors)): ?>
             <div class="error">
@@ -42,33 +42,52 @@
         <form method="post" id="registerForm" action="/register">
 
             <label>Full Name</label>
-            <input type="text" name="full_name" placeholder="Enter your                                                                                                                                                            full name" required>
+            <input
+                type="text"
+                name="full_name"
+                placeholder="Enter your full name"
+                required
+            >
 
             <label>Email Address</label>
-            <input type="email" name="email" placeholder="enter your email address" required>
+            <input
+                type="email"
+                name="email"
+                placeholder="user@example.com"
+                required
+            >
 
             <label>Password</label>
             <div class="password">
-            <input type="password" name="password" id="password-field"  placeholder="enter password" required>
-            <span class="fa fa-eye-slash toggle-password" id="togglePassword"></span>
+                <input
+                    type="password"
+                    name="password"
+                    id="password-field"
+                    required
+                >
+                <span id="togglePassword" class="fa fa-eye-slash"></span>
             </div>
+
             <label>Confirm Password</label>
-           <div class="password">
-           <input type="password" name="confirm_password" id="confirm-password-field" placeholder="confirm password" required>
-           <span class="fa fa-eye-slash toggle-password" id="toggleConfirmPassword"></span>
-           </div>
-
-
-            <!-- <label class="checkbox">
-                <input type="checkbox" required>
-                I agree to the Terms & Privacy Policy
-            </label> -->
+            <div class="password">
+                <input
+                    type="password"
+                    name="confirm_password"
+                    id="confirm-password-field"
+                    required
+                >
+                <span id="toggleConfirmPassword" class="fa fa-eye-slash"></span>
+            </div>
 
             <button type="submit">Create Account</button>
 
-            <p class="switch">Already a member? <a href="/login">Log In</a></p>
+            <p class="switch">
+                Already have an account?
+                <a href="/login">Log in</a>
+            </p>
         </form>
     </section>
+
 </main>
 
 <script src="/assets/js/register.js"></script>

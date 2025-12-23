@@ -1,15 +1,14 @@
-$(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("togglePassword");
+    const input = document.getElementById("password-field");
 
-    $("#togglePassword").click(function () {
-        const input = $("#password-field");
+    if (!toggle || !input) return;
 
-        if (input.attr("type") === "password") {
-            input.attr("type", "text");
-            $(this).removeClass("fa-eye-slash").addClass("fa-eye");
-        } else {
-            input.attr("type", "password");
-            $(this).removeClass("fa-eye").addClass("fa-eye-slash");
-        }
+    toggle.addEventListener("click", function () {
+        const isPassword = input.type === "password";
+        input.type = isPassword ? "text" : "password";
+
+        toggle.classList.toggle("fa-eye");
+        toggle.classList.toggle("fa-eye-slash");
     });
-
 });

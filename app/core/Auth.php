@@ -46,4 +46,16 @@ class Auth
 
         return $stmt->get_result()->fetch_assoc() ?: null;
     }
+
+     public static function check(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (empty($_SESSION['user_id'])) {
+            header("Location: /login");
+            exit;
+        }
+    }
 }

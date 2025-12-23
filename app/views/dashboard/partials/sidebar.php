@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 /**
  * Sidebar navigation
  * Expected variables:
@@ -13,7 +15,7 @@
     <div class="sidebar-brand">
         <div class="brand-icon">
             <!-- replace with svg/logo if needed -->
-            <span class="logo-dot"></span>
+            <!-- <span class="logo-dot"></span> -->
         </div>
         <span class="brand-text">WeatherNotify</span>
     </div>
@@ -21,44 +23,34 @@
     <!-- Navigation -->
     <nav class="sidebar-nav">
 
-        <a href="#"
+        <a href="/dashboard?page=overview"
            class="nav-item <?= $activePage === 'overview' ? 'active' : '' ?>"
            data-page="overview">
             <span class="icon">🏠</span>
             <span>Dashboard</span>
         </a>
 
-        <a href="#"
+        <a href="/dashboard?page=alerts"
            class="nav-item <?= $activePage === 'alerts' ? 'active' : '' ?>"
            data-page="alerts">
             <span class="icon">🔔</span>
             <span>My Alerts</span>
         </a>
 
-        <a href="#"
+        <a href="/dashboard?page=history"
            class="nav-item <?= $activePage === 'history' ? 'active' : '' ?>"
            data-page="history">
             <span class="icon">🕘</span>
             <span>History</span>
         </a>
 
-        <a href="#"
+        <a href="/dashboard?page=subscriptions"
            class="nav-item <?= $activePage === 'subscriptions' ? 'active' : '' ?>"
            data-page="subscriptions">
             <span class="icon">💳</span>
             <span>Subscriptions</span>
         </a>
-
-        <?php if ($role === 'admin'): ?>
-            <a href="#"
-               class="nav-item <?= $activePage === 'users' ? 'active' : '' ?>"
-               data-page="users">
-                <span class="icon">👥</span>
-                <span>Users</span>
-            </a>
-        <?php endif; ?>
-
-        <a href="#"
+        <a href="/dashboard?page=settings"
            class="nav-item <?= $activePage === 'settings' ? 'active' : '' ?>"
            data-page="settings">
             <span class="icon">⚙️</span>

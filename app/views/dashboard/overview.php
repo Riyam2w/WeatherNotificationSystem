@@ -1,151 +1,168 @@
-<?php declare(strict_types=1); ?>
+<?php
+declare(strict_types=1);
 
-<!-- HEADER -->
-<header class="top">
-    <div>
-        <h1>Welcome back, <?= htmlspecialchars($user['name']) ?></h1>
-        <p>Here's what's happening with your weather alerts today.</p>
-    </div>
+?>
+<div class="dashboard">
 
-    <div class="plan">
+    <div class="dashboard-header">
         <div>
-            <small>CURRENT PLAN</small>
-            <strong><?= htmlspecialchars($subscription['plan_name'] ?? 'Free') ?></strong>
-            <span class="badge green">Active</span>
+            <h1>Welcome back, 
+                <!-- <?= htmlspecialchars($_SESSION['UserName']) ?> -->
+            </h1>
+            <p>Here's what's happening with your weather alerts today.</p>
         </div>
-        <div>
-            <small>EXPIRES</small>
-            <strong><?= htmlspecialchars($subscription['valid_till'] ?? '—') ?></strong>
-            <a href="/subscription/upgrade" class="upgrade">Upgrade</a>
+
+        <div class="plan-card">
+            <div>
+                <small>CURRENT PLAN</small>
+                <strong>
+                    <!-- <?= htmlspecialchars($plan['name']) ?> -->
+                </strong>
+                <span class="badge active">
+                    <!-- <?= htmlspecialchars($plan['status']) ?> -->
+                </span>
+            </div>
+            <div>
+                <small>EXPIRES</small>
+                <strong>
+                    <!-- <?= htmlspecialchars($plan['expiry']) ?> -->
+                </strong>
+                <a href="/upgrade">Upgrade</a>
+            </div>
         </div>
     </div>
-</header>
 
-<!-- STATS -->
-<section class="stats">
-    <div class="stat">
-        <span>Cities Monitored</span>
-        <strong><?= (int)$stats['cities'] ?></strong>
-    </div>
-    <div class="stat">
-        <span>Active Alerts</span>
-        <strong><?= (int)$stats['active'] ?></strong>
-    </div>
-    <div class="stat">
-        <span>Triggered Today</span>
-        <strong><?= (int)$stats['today'] ?></strong>
-    </div>
-    <div class="stat">
-        <span>Last Alert Sent</span>
-        <strong><?= htmlspecialchars($stats['last'] ?? '—') ?></strong>
-    </div>
-</section>
+    <!-- STATS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span>Cities Monitored</span>
+            <strong>
+                <!-- <?= $stats['cities_count'] ?> -->
+            </strong>
+        </div>
 
-<!-- CONTENT GRID -->
-<section class="grid">
+        <div class="stat-card">
+            <span>Active Alerts</span>
+            <strong>
+                <!-- <?= $stats['active_alerts'] ?> -->
+            </strong>
+        </div>
 
-    <!-- ACTIVE ALERTS -->
-    <div class="card">
-        <header class="card-header">
-            <h2>Active Alerts</h2>
-            <a href="#" data-page="alerts" class="view-all">View All</a>
-        </header>
+        <div class="stat-card">
+            <span>Triggered Today</span>
+            <strong>
+                <!-- <?= $stats['triggered_today'] ?> -->
+            </strong>
+        </div>
 
-        <table class="alerts-table">
-            <thead>
+        <div class="stat-card">
+            <span>Last Alert Sent</span>
+            <strong>
+                <!-- <?= $stats['last_alert_time'] ?> -->
+            </strong>
+        </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="dashboard-grid">
+
+        <!-- ACTIVE ALERTS -->
+        <section class="card">
+            <header>
+                <h3>Active Alerts</h3>
+                <a href="/alerts">View All</a>
+            </header>
+
+            <table>
+                <thead>
                 <tr>
-                    <th>CITY</th>
-                    <th>CONDITION</th>
-                    <th>STATUS</th>
-                    <th>ACTIONS</th>
+                    <th>City</th>
+                    <th>Condition</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
+                </thead>
+
+                <tbody>
+                <?php foreach ($alerts as $alert): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($alert['city']) ?></td>
+                        <td><?= htmlspecialchars($alert['condition']) ?></td>
+                        <td>
+                            <span class="status <?= $alert['status'] ?>">
+                                <?= ucfirst($alert['status']) ?>
+                            </span>
+                        </td>
+                        <td class="actions">
+                            <a href="#">⏸</a>
+                            <a href="#">✏️</a>
+                            <a href="#">🗑</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- QUICK ADD ALERT -->
+        <section class="card">
+            <h3>Quick Add Alert</h3>
+            <p>Get notified instantly when weather changes.</p>
+
+            <form method="post" action="/alerts/create">
+                <label>City Name</label>
+                <input type="text" name="city" required>
+
+                <label>Condition</label>
+                <select name="condition">
+                    <option value="temp_above">Temperature Above</option>
+                    <option value="rain">Rain</option>
+                    <option value="storm">Storm</option>
+                </select>
+
+                <label>Threshold Value</label>
+                <div class="inline">
+                    <input type="number" name="threshold" required>
+                    <span>°C</span>
+                </div>
+
+                <button type="submit">Create Alert</button>
+            </form>
+        </section>
+
+    </div>
+
+    <!-- HISTORY -->
+    <section class="card">
+        <h3>Recent Alert History</h3>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Time Sent</th>
+                <th>City</th>
+                <th>Trigger Event</th>
+                <th>Delivery</th>
+            </tr>
             </thead>
+
             <tbody>
-            <?php foreach ($alerts as $a): ?>
+            <?php foreach ($history as $row): ?>
                 <tr>
+                    <td><?= $row['time'] ?></td>
+                    <td><?= $row['city'] ?></td>
+                    <td><?= $row['event'] ?></td>
                     <td>
-                        <div class="city">
-                            <img src="/assets/images/cities/<?= strtolower($a['city']) ?>.png" alt="">
-                            <?= htmlspecialchars($a['city']) ?>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="pill <?= $a['alert_type'] ?>">
-                            <?= htmlspecialchars($a['label']) ?>
+                        <span class="delivery <?= $row['status'] ?>">
+                            <?= ucfirst($row['status']) ?>
                         </span>
-                    </td>
-                    <td>
-                        <span class="status <?= $a['is_active'] ? 'green' : 'yellow' ?>">
-                            <?= $a['is_active'] ? 'Monitoring' : 'Paused' ?>
-                        </span>
-                    </td>
-                    <td class="actions">
-                        <button title="Pause">⏸</button>
-                        <button title="Edit">✏️</button>
-                        <button title="Delete" class="danger">🗑</button>
                     </td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
         </table>
-    </div>
 
-    <!-- QUICK ADD ALERT -->
-    <div class="card side">
-        <h3>Quick Add Alert</h3>
-        <p class="muted">Get notified instantly when weather changes.</p>
+        <a class="view-history" href="/history">View Full History</a>
+    </section>
 
-        <form method="post" action="/alerts/create">
-            <label>City Name</label>
-            <input type="text" name="city" placeholder="Search city..." required>
-
-            <label>Condition</label>
-            <select name="alert_type" required>
-                <option value="temp_above">Temperature Above</option>
-                <option value="rain">Rain</option>
-                <option value="storm">Storm</option>
-            </select>
-
-            <label>Threshold Value</label>
-            <div class="threshold">
-                <input type="number" name="threshold_value" required>
-                <span>°C</span>
-            </div>
-
-            <button type="submit" class="primary">
-                🔔 Create Alert
-            </button>
-        </form>
-    </div>
-
-</section>
-
-<!-- RECENT HISTORY -->
-<section class="card">
-    <h2>Recent Alert History</h2>
-
-    <table class="history-table">
-        <thead>
-            <tr>
-                <th>TIME SENT</th>
-                <th>CITY</th>
-                <th>TRIGGER EVENT</th>
-                <th>DELIVERY</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($history as $h): ?>
-            <tr>
-                <td><?= htmlspecialchars($h['sent_at']) ?></td>
-                <td><?= htmlspecialchars($h['city']) ?></td>
-                <td><?= htmlspecialchars($h['event']) ?></td>
-                <td>
-                    <span class="badge <?= $h['status'] === 'sent' ? 'green' : 'red' ?>">
-                        <?= ucfirst($h['status']) ?>
-                    </span>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-</section>
+</div>
