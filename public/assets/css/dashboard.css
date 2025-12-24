@@ -8,9 +8,12 @@
     height: 100vh;
     background: #ffffff;
     border-right: 1px solid #e5e7eb;
-
+    position: fixed;
     display: flex;
     flex-direction: column;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
 }
 
 /* BRAND */
@@ -153,4 +156,8 @@
 
 .logout-btn:hover {
     background: #fee2e2;
+}
+.dashboard-content {
+    margin-left: 260px;
+    padding: 24px;
 }
