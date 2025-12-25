@@ -32,6 +32,8 @@ require_once __DIR__ . '/../app/core/Auth.php';
 require_once __DIR__ . '/../app/controllers/HomeController.php';
 require_once __DIR__ . '/../app/controllers/AuthController.php';
 require_once __DIR__ . '/../app/controllers/DashboardController.php';
+require_once __DIR__ . '/../app/controllers/AlertController.php';
+
 
 /* -------------------------
    Controller Instances
@@ -39,6 +41,8 @@ require_once __DIR__ . '/../app/controllers/DashboardController.php';
 $homeController      = new HomeController();
 $authController      = new AuthController($conn);
 $dashboardController = new DashboardController($conn);
+$alertController = new AlertController($conn);
+
 
 /* -------------------------
    Routing
@@ -70,7 +74,7 @@ switch ($path) {
     case '/logout':
         session_unset();
         session_destroy();
-        header('Location: /login');
+        header('Location: /home');
         exit;
 
     /* ---------- Dashboard ---------- */
@@ -82,6 +86,7 @@ switch ($path) {
         $dashboardController->index();
         break;
 
+        
     case '/dashboard/load':
         if (empty($_SESSION['user_id'])) {
             http_response_code(401);
@@ -89,7 +94,6 @@ switch ($path) {
         }
         $dashboardController->load();
         break;
-
     /* ---------- 404 ---------- */
     default:
         http_response_code(404);

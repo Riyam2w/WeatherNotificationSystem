@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const content  = document.getElementById("dashboard-content");
 
     function loadPage(page, pushState = true) {
-        fetch(`/dashboard/load?page=${page}`, {
+        fetch(`/dashboard/load?page=${encodeURIComponent(page)}`, {
             credentials: "same-origin"
         })
         .then(res => {
@@ -17,17 +17,17 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(html => {
             content.innerHTML = html;
 
-            /* 🔴 IMPORTANT: re-initialize dynamic UI after AJAX load */
-            initLocationDropdowns();
+            // Re-init dynamic features
+            initCityAutocomplete();
+            initCreateAlertForm();
 
-            // Update sidebar active state
+            // Sidebar active state
             navItems.forEach(i => i.classList.remove("active"));
             const active = document.querySelector(`.nav-item[data-page="${page}"]`);
             if (active) active.classList.add("active");
 
-            // Update browser URL
             if (pushState) {
-                window.history.pushState({}, "", `/dashboard?page=${page}`);
+                history.pushState({}, "", `/dashboard?page=${page}`);
             }
         })
         .catch(() => {
@@ -35,43 +35,35 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Sidebar navigation click
     navItems.forEach(item => {
-        item.addEventListener("click", (e) => {
+        item.addEventListener("click", e => {
             e.preventDefault();
             const page = item.dataset.page;
-            if (!page) return;
-
-            loadPage(page);
+            if (page) loadPage(page);
         });
     });
 
-    // Browser back / forward
     window.addEventListener("popstate", () => {
-        const params = new URLSearchParams(window.location.search);
-        const page = params.get("page") || "alerts";
+        const page = new URLSearchParams(location.search).get("page") || "alerts";
         loadPage(page, false);
     });
 
-    // Initial load if URL has ?page=
-    const initialPage = new URLSearchParams(window.location.search).get("page");
-    if (initialPage) {
-        loadPage(initialPage, false);
-    }
+    const initialPage = new URLSearchParams(location.search).get("page");
+    if (initialPage) loadPage(initialPage, false);
 });
+
 
 /* =========================================================
    WEATHER CONDITION SELECTION
    ========================================================= */
 
-document.addEventListener("click", (e) => {
+document.addEventListener("click", e => {
     const card = e.target.closest(".condition-card");
     if (!card) return;
 
     e.preventDefault();
 
-    document
-        .querySelectorAll(".condition-card")
+    document.querySelectorAll(".condition-card")
         .forEach(c => c.classList.remove("active"));
 
     card.classList.add("active");
@@ -82,75 +74,137 @@ document.addEventListener("click", (e) => {
     }
 });
 
+
 /* =========================================================
-   COUNTRY → STATE → CITY DROPDOWNS
+   CITY AUTOCOMPLETE (OpenWeather GEO API)
    ========================================================= */
 
-function initLocationDropdowns() {
-    const countrySelect = document.getElementById("country");
-    const stateSelect   = document.getElementById("state");
-    const citySelect    = document.getElementById("city");
+function initCityAutocomplete() {
 
-    if (!countrySelect || !stateSelect || !citySelect) return;
+    const API_KEY = "c4e6dd84573d65a9b87404115c759ee7";
 
-    countrySelect.innerHTML = '<option value="">Country</option>';
-    stateSelect.innerHTML   = '<option value="">State</option>';
-    citySelect.innerHTML    = '<option value="">City</option>';
+    const input = document.getElementById("citySearch");
+    const list  = document.getElementById("cityResults");
 
-    stateSelect.disabled = true;
-    citySelect.disabled  = true;
+    if (!input || !list) return;
+    if (input.dataset.initialized === "true") return;
+    input.dataset.initialized = "true";
 
-    // Load countries
-    fetch('/api/locations.php?type=countries')
-        .then(res => res.json())
-        .then(countries => {
-            countries.forEach(c => {
-                const opt = document.createElement("option");
-                opt.value = c.iso2;
-                opt.textContent = c.name;
-                countrySelect.appendChild(opt);
-            });
+    const cityNameInput = document.getElementById("city_name");
+    const latInput      = document.getElementById("lat");
+    const lonInput      = document.getElementById("lon");
+
+    let debounceTimer = null;
+
+    input.addEventListener("input", () => {
+        const query = input.value.trim();
+        list.innerHTML = "";
+
+        if (query.length < 3) return;
+
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            fetch(
+                `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
+            )
+            .then(res => res.json())
+            .then(data => {
+                list.innerHTML = "";
+                if (!Array.isArray(data)) return;
+
+                data.forEach(city => {
+                    const li = document.createElement("li");
+                    li.textContent =
+                        `${city.name}${city.state ? ", " + city.state : ""}, ${city.country}`;
+
+                    li.addEventListener("click", () => {
+                        input.value = li.textContent;
+                        cityNameInput.value = city.name;
+                        latInput.value = city.lat;
+                        lonInput.value = city.lon;
+                        list.innerHTML = "";
+                    });
+
+                    list.appendChild(li);
+                });
+            })
+            .catch(console.error);
+        }, 300);
+    });
+
+    document.addEventListener("click", e => {
+        if (!e.target.closest(".form-section")) {
+            list.innerHTML = "";
+        }
+    });
+}
+
+
+/* =========================================================
+   CREATE ALERT → CONFIRM (AJAX POST)
+   ========================================================= */
+
+function initCreateAlertForm() {
+
+    const form = document.querySelector(".create-alert-page form");
+    if (!form || form.dataset.bound === "true") return;
+
+    form.dataset.bound = "true";
+
+    form.addEventListener("submit", e => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        formData.append("page", "create_alert_confirm");
+
+        fetch("/dashboard/load", {
+            method: "POST",
+            body: formData,
+            credentials: "same-origin"
+        })
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById("dashboard-content").innerHTML = html;
+            initCreateAlertConfirm();
+        })
+        .catch(() => {
+            alert("Failed to load confirmation page");
         });
+    });
+}
 
-    // Country → State
-    countrySelect.onchange = () => {
-        stateSelect.innerHTML = '<option value="">State</option>';
-        citySelect.innerHTML  = '<option value="">City</option>';
-        stateSelect.disabled = true;
-        citySelect.disabled  = true;
 
-        if (!countrySelect.value) return;
+/* =========================================================
+   CONFIRM PAGE → STORE ALERT (FIXED)
+   ========================================================= */
 
-        fetch(`/api/locations.php?type=states&country=${countrySelect.value}`)
-            .then(res => res.json())
-            .then(states => {
-                states.forEach(s => {
-                    const opt = document.createElement("option");
-                    opt.value = s.state_code;
-                    opt.textContent = s.name;
-                    stateSelect.appendChild(opt);
-                });
-                stateSelect.disabled = false;
-            });
-    };
+function initCreateAlertConfirm() {
 
-    // State → City
-    stateSelect.onchange = () => {
-        citySelect.innerHTML = '<option value="">City</option>';
-        citySelect.disabled = true;
+    const btn  = document.getElementById("confirmCreateAlert");
+    const form = document.getElementById("confirmForm");
 
-        if (!stateSelect.value) return;
+    if (!btn || !form) return;
+    if (btn.dataset.bound === "true") return;
 
-        fetch(`/api/locations.php?type=cities&country=${countrySelect.value}&state=${stateSelect.value}`)
-            .then(res => res.json())
-            .then(cities => {
-                cities.forEach(c => {
-                    const opt = document.createElement("option");
-                    opt.value = c.name;
-                    opt.textContent = c.name;
-                    citySelect.appendChild(opt);
-                });
-                citySelect.disabled = false;
-            });
-    };
+    btn.dataset.bound = "true";
+
+    btn.addEventListener("click", () => {
+
+        const data = new FormData(form);
+        data.append("page", "create-alert-store");
+
+        fetch("/dashboard/load", {
+            method: "POST",
+            body: data,
+            credentials: "same-origin"
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Insert failed");
+            window.location.href = "/dashboard?page=alerts";
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Failed to create alert");
+        });
+    });
 }
