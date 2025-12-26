@@ -1,0 +1,48 @@
+.hero {
+    display: flex;
+    justify-content: space-between;
+    padding: 80px;
+}
+
+.hero h1 span {
+    color: #2563eb;
+}
+
+.hero-actions {
+    margin-top: 24px;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+}
+
+.btn-outline {
+    border: 1px solid #2563eb;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-left: 12px;
+}
+
+.steps, .features, .pricing, .cta {
+    padding: 80px;
+    text-align: center;
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.price-card {
+    border: 1px solid #e5e7eb;
+    padding: 24px;
+    border-radius: 12px;
+}
+
+.price-card.featured {
+    border: 2px solid #2563eb;
+}

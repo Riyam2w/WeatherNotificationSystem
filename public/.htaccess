@@ -1,0 +1,13 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Prevent direct access to core/app files
+RewriteRule ^(app|config|core|middleware|views)/ - [F,L]
+
+# Allow existing files and directories (CSS, JS, images)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Route all other requests to index.php
+RewriteRule ^ index.php [QSA,L]
