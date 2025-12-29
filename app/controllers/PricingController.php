@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../models/Plan.php';
 
-class HomeController extends Controller
+class PricingController extends Controller
 {
     public function index(): void
     {
@@ -12,8 +12,8 @@ class HomeController extends Controller
         $planModel = new Plan($conn);
         $plans = $planModel->getPlansWithFeatures();
 
-        $this->view('home/index', [
-            'title' => 'WeatherNotify – Automated Weather Alerts',
+        $this->view('pricing/index', [
+            'title' => 'Pricing – WeatherGuard',
             'plans' => $plans
         ]);
     }

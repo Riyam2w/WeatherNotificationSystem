@@ -8,35 +8,17 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
 </head>
 <body>
-
-<main class="container">
-    <!-- LEFT HERO -->
-    <section class="hero">
-        <div class="logo">🌩 WeatherNotify</div>
-
-        <h1>Monitor the skies<br>with precision.</h1>
-        <p>
-            Real-time alerts and detailed forecasts to keep you one
-            step ahead of the storm.
-        </p>
-    </section>
-
-    <!-- RIGHT CARD -->
-    <section class="card">
+    <main class="page-wrapper">
+<div class="auth-wrapper">
+<section class="card">
         <h2>Forgot password?</h2>
         <p>No worries, we’ll send you reset instructions.</p>
 
-        <?php if (!empty($error)): ?>
-            <div class="error"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
 
-        <?php if (!empty($message)): ?>
-            <div class="success"><?= htmlspecialchars($message) ?></div>
-        <?php endif; ?>
-
-        <form method="post" action="/forgot-password">
+        <form id="forgotpasswordForm" novalidate>
             <label>Email Address</label>
             <div class="password">
                 <input type="email" name="email" placeholder="user@example.com" required>
@@ -49,8 +31,11 @@
                 <a href="/login" class="forgot-link">← Back to log in</a>
             </div>
         </form>
-    </section>
-</main>
 
+        <div id="formMessage"></div>
+    </section>
+</div>
+</main>
+<script src="/assets/js/auth/forgot_password.js" defer></script>
 </body>
 </html>

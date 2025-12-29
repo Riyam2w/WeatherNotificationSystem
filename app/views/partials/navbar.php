@@ -1,23 +1,34 @@
-<header class="navbar">
+<?php declare(strict_types=1); ?>
+
+<nav class="navbar">
     <div class="nav-container">
 
         <!-- Logo -->
-        <div class="nav-logo">
-            <!-- <img src="/assets/images/cloud-icon.svg" alt="WeatherNotify"> -->
-            <span>WeatherNotify</span>
-        </div>
+        <a href="/" class="nav-logo">
+            🌩 WeatherNotify
+        </a>
 
-        <!-- Nav Links -->
-        <nav class="nav-links">
-            <a href="/features">Features</a>
-            <a href="/pricing">Pricing</a>
-            <a href="/about">About</a>
-        </nav>
+        <!-- Navigation -->
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/#features">Features</a></li>
+            <li><a href="/pricing">Pricing</a></li>
 
-        <!-- CTA Button -->
-        <div class="nav-cta">
-            <a href="/register" class="btn-signup">Sign Up</a>
+                      <?php if (!empty($_SESSION['user_id'])): ?>
+
+                <li><a href="/dashboard">Dashboard</a></li>
+            <?php endif; ?>
+        </ul>
+
+        <!-- Actions -->
+         <div class="nav-actions">
+            <?php if (!empty($_SESSION['user_id'])): ?>
+                <a href="/dashboard" class="btn-outline">Dashboard</a>
+                <a href="/logout" class="btn-outline">Logout</a>
+            <?php else: ?>
+                <a href="/register" class="btn-primary">Sign Up</a>
+            <?php endif; ?>
         </div>
 
     </div>
-</header>
+</nav>

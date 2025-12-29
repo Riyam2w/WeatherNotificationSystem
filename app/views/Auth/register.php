@@ -3,43 +3,23 @@
 <head>
     <title>WeatherNotify | Register</title>
 
-    <!-- Shared Auth CSS -->
-    <link rel="stylesheet" href="/assets/css/auth.css">
-
     <!-- Font Awesome for eye icons -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+
 </head>
 
 <body class="auth register-page">
-
-<main class="container">
-
-    <!-- LEFT HERO (same as login) -->
-    <section class="hero">
-        <div class="logo">🌩 WeatherNotify</div>
-
-        <h1>Monitor the skies<br>with precision.</h1>
-        <p>
-            Real-time alerts and detailed forecasts to keep you one
-            step ahead of the storm.
-        </p>
-    </section>
-
-    <!-- RIGHT CARD -->
-    <section class="card">
+    <main class="page-wrapper">
+<div class="auth-wrapper">
+<section class="card">
         <h2>Create your account</h2>
         <p>Start receiving real-time weather alerts today.</p>
 
-        <?php if (!empty($errors)): ?>
-            <div class="error">
-                <?php foreach ($errors as $e): ?>
-                    <p><?= htmlspecialchars($e) ?></p>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
+        <div id="formMessage"></div>
 
-        <form method="post" id="registerForm" action="/register">
+        <form id="registerForm" novalidate>
 
             <label>Full Name</label>
             <input
@@ -88,8 +68,8 @@
         </form>
     </section>
 
+</div>
 </main>
-
-<script src="/assets/js/register.js"></script>
+<script src="/assets/js/auth/register.js" defer></script>
 </body>
 </html>

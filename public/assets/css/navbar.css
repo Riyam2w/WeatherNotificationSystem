@@ -4,6 +4,7 @@
     padding: 16px 40px;
     background: #fff;
     border-bottom: 1px solid #e5e7eb;
+    text-decoration: none;
 }
 
 .nav-container {
@@ -12,12 +13,14 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    
 }
 
 .nav-links {
     display: flex;
     gap: 24px;
     list-style: none;
+    text-decoration: none;
 }
 
 .nav-actions {
@@ -29,4 +32,5 @@
 .nav-user {
     font-weight: 500;
     color: #374151;
+    text-decoration: none;
 }

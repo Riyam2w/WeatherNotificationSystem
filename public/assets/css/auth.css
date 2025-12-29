@@ -1,96 +1,56 @@
-/* RESET */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* =========================================================
+   AUTH PAGE BASE (ALL AUTH PAGES)
+========================================================= */
 
-/* BASE */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
-    background: #ffffff;
-    color: #0f172a;
-}
-
-/* MAIN CONTAINER */
-.container {
+.page-wrapper {
+    min-height: calc(100vh - 140px); /* navbar + footer height */
     display: flex;
-    height: 100vh;
-    width: 100%;
-}
-
-/* LEFT HERO SECTION */
-.hero {
-    flex: 1;
-    padding: 64px;
-    color: #ffffff;
-
-    background: linear-gradient(
-        to bottom,
-        rgba(15, 23, 42, 0.65),
-        rgba(15, 23, 42, 0.9)
-    ),
-    url("/assets/images/login.png") center/cover no-repeat;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-}
-
-/* LOGO */
-.hero .logo {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: auto;
-}
-
-/* HERO TEXT */
-.hero h1 {
-    font-size: 40px;
-    line-height: 1.15;
-    margin-bottom: 16px;
-}
-
-.hero p {
-    font-size: 15px;
-    max-width: 420px;
-    color: #e5e7eb;
-}
-
-/* RIGHT CARD SECTION */
-.card {
-    flex: 1;
-    max-width: 520px;
-    padding: 64px 72px;
-
-    display: flex;
-    flex-direction: column;
+    align-items: center;
     justify-content: center;
 }
 
-/* HEADINGS */
+.auth-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+/* =========================================================
+   CARD (FORM CONTAINER)
+========================================================= */
+
+.card {
+    width: 100%;
+    max-width: 460px;
+
+    padding: 48px;
+    background: #ffffff;
+
+    border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================================
+   HEADINGS & TEXT
+========================================================= */
+
 .card h2 {
-    font-size: 28px;
+    font-size: 26px;
     margin-bottom: 8px;
 }
 
 .card p {
     font-size: 14px;
     color: #64748b;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
 }
 
-/* ERROR MESSAGE */
-.error {
-    background: #fee2e2;
-    color: #b91c1c;
-    padding: 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    margin-bottom: 16px;
-}
+/* =========================================================
+   FORM ELEMENTS
+========================================================= */
 
-/* FORM */
 form {
     width: 100%;
 }
@@ -104,6 +64,7 @@ label {
 }
 
 input[type="email"],
+input[type="text"],
 input[type="password"] {
     width: 100%;
     padding: 12px 14px;
@@ -112,6 +73,10 @@ input[type="password"] {
     border: 1px solid #cbd5e1;
     border-radius: 6px;
     margin-bottom: 18px;
+
+    background: #ffffff;
+    color: #0f172a;
+    transition: border-color 0.2s ease;
 }
 
 input:focus {
@@ -119,7 +84,10 @@ input:focus {
     border-color: #2563eb;
 }
 
-/* PASSWORD FIELD */
+/* =========================================================
+   PASSWORD / ICON FIELD
+========================================================= */
+
 .password {
     position: relative;
 }
@@ -133,7 +101,10 @@ input:focus {
     cursor: pointer;
 }
 
-/* FORGOT PASSWORD */
+/* =========================================================
+   LINKS & HELPERS
+========================================================= */
+
 .forgot-password {
     text-align: right;
     margin-bottom: 24px;
@@ -149,7 +120,10 @@ input:focus {
     text-decoration: underline;
 }
 
-/* BUTTON */
+/* =========================================================
+   BUTTON
+========================================================= */
+
 button {
     width: 100%;
     padding: 14px;
@@ -167,7 +141,10 @@ button:hover {
     background: #1e40af;
 }
 
-/* SWITCH LINK */
+/* =========================================================
+   SWITCH LINK
+========================================================= */
+
 .switch {
     margin-top: 24px;
     font-size: 13px;
@@ -185,39 +162,12 @@ button:hover {
     text-decoration: underline;
 }
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
-    .container {
-        flex-direction: column;
-    }
+/* =========================================================
+   MOBILE RESPONSIVE
+========================================================= */
 
-    .hero {
-        min-height: 280px;
-        padding: 32px;
-    }
-
-    .hero h1 {
-        font-size: 28px;
-    }
-
+@media (max-width: 600px) {
     .card {
-        max-width: 100%;
-        padding: 40px 24px;
+        padding: 32px 24px;
     }
-}
-
-input[type="email"],
-input[type="text"],
-input[type="password"] {
-    width: 100%;
-    padding: 12px 14px;
-    font-size: 14px;
-
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-
-    background: #ffffff;
-    color: #0f172a;
-
-    transition: border-color 0.2s ease;
 }

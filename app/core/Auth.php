@@ -3,36 +3,41 @@ declare(strict_types=1);
 
 class Auth
 {
-    public static function requireLogin(): void
+    /**
+     * Authentication guard used by AuthMiddleware
+     */
+    public static function check(): void
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+        if (!empty($_SESSION['user_id'])) {
+            return;
         }
 
-        if (empty($_SESSION['user_id'])) {
+         else {
             header('Location: /login');
-            exit;
         }
+
+        exit;
     }
 
+    /**
+     * Get logged-in user ID
+     */
     public static function id(): int
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
         return (int) ($_SESSION['user_id'] ?? 0);
     }
 
-    // ✅ ADD THIS
-    public static function user(mysqli $conn): ?array
+    /**
+     * Get logged-in user details
+     */
+    public static function user($conn): ?array
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
         if (empty($_SESSION['user_id'])) {
             return null;
+        }
+
+        if (!$conn instanceof mysqli) {
+            throw new RuntimeException('Invalid database connection');
         }
 
         $stmt = $conn->prepare(
@@ -41,21 +46,26 @@ class Auth
              WHERE id = ?
              LIMIT 1"
         );
+
         $stmt->bind_param("i", $_SESSION['user_id']);
         $stmt->execute();
 
         return $stmt->get_result()->fetch_assoc() ?: null;
     }
 
-     public static function check(): void
+    /**
+     * AJAX logout helper
+     */
+    public static function logout(): void
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        session_unset();
+        session_destroy();
 
-        if (empty($_SESSION['user_id'])) {
-            header("Location: /login");
-            exit;
-        }
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success'  => true,
+            'redirect' => '/login'
+        ]);
+        exit;
     }
 }

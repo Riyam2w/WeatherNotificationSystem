@@ -28,6 +28,8 @@ if (!($conn instanceof mysqli)) {
 require_once __DIR__ . '/../app/core/Controller.php';
 require_once __DIR__ . '/../app/core/Auth.php';
 require_once __DIR__ . '/../app/core/Router.php';
+require_once __DIR__ . '/../app/controllers/PricingController.php';
+
 
 /* Controllers */
 require_once __DIR__ . '/../app/controllers/HomeController.php';
@@ -45,6 +47,7 @@ $router = new Router($conn);
 
 /* HOME (CRITICAL) */
 $router->get('/', 'HomeController@index');
+$router->get('/pricing', 'PricingController@index');
 
 /* Auth */
 $router->get('/login', 'AuthController@showLogin');

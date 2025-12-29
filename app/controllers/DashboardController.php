@@ -3,64 +3,48 @@ declare(strict_types=1);
 
 class DashboardController extends Controller
 {
-    private mysqli $conn;
-
-    public function __construct(mysqli $conn)
+    /**
+     * Loads the main dashboard shell
+     */
+    public function index(): void
     {
-        $this->conn = $conn;
+        $activePage = $_GET['page'] ?? 'overview';
+
+        $this->view(
+            'dashboard/main',
+            [
+                'activePage' => $activePage,
+                'userName'   => $_SESSION['user_name'] ?? 'User',
+            ],
+            'dashboard' // ✅ dashboard layout (no navbar/footer)
+        );
     }
 
-    public function index(string $page = 'overview'): void
+    /**
+     * AJAX loader for dashboard pages
+     */
+    public function load(): void
     {
-        // USER
-        $userName = $_SESSION['full_name'] ?? 'User';
+        header('Content-Type: text/html; charset=UTF-8');
 
-        // PLAN (temporary – replace with DB later)
-        $plan = [
-            'name'   => 'Free Plan',
-            'status' => 'active',
-            'expiry' => 'Never',
+        $page = $_GET['page'] ?? 'overview';
+
+        $map = [
+            'overview'      => 'overview.php',
+            'alerts'        => 'alerts.php',
+            'create-alert'  => 'create_alert.php',
+            'create_alert_confirm'  => 'create_alert_confirm.php',
+            'subscriptions' => 'subscriptions.php',
+            'settings'      => 'settings.php',
         ];
 
-        // STATS (temporary)
-        $stats = [
-            'cities_count'     => 2,
-            'active_alerts'    => 3,
-            'triggered_today'  => 1,
-            'last_alert_time'  => 'Today, 10:30 AM',
-        ];
+        if (!isset($map[$page])) {
+            http_response_code(400);
+            echo 'Invalid page';
+            exit;
+        }
 
-        // ALERTS (temporary)
-        $alerts = [
-            [
-                'city'      => 'Delhi',
-                'condition' => 'Temp > 40°C',
-                'status'    => 'active',
-            ],
-            [
-                'city'      => 'Mumbai',
-                'condition' => 'Rain',
-                'status'    => 'paused',
-            ],
-        ];
-
-        // HISTORY (temporary)
-        $history = [
-            [
-                'time'   => '2025-01-22 09:15',
-                'city'   => 'Delhi',
-                'event'  => 'Temperature crossed 40°C',
-                'status' => 'sent',
-            ],
-        ];
-
-        $this->view('dashboard/overview', compact(
-            'userName',
-            'plan',
-            'stats',
-            'alerts',
-            'history'
-        ));
+        require __DIR__ . '/../views/dashboard/pages/' . $map[$page];
+        exit;
     }
 }
-

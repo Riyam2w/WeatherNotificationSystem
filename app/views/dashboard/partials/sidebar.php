@@ -1,57 +1,47 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-/**
- * Sidebar navigation
- * Expected variables:
- * - $role (admin | user)
- * - $activePage (string)
- */
+
 ?>
 
 <aside class="sidebar">
 
     <!-- Brand -->
     <div class="sidebar-brand">
-        <div class="brand-icon">
-            <!-- replace with svg/logo if needed -->
-            <!-- <span class="logo-dot"></span> -->
-        </div>
         <span class="brand-text">WeatherNotify</span>
     </div>
 
     <!-- Navigation -->
     <nav class="sidebar-nav">
 
-        <a href="/dashboard?page=overview"
+        <a href="#"
            class="nav-item <?= $activePage === 'overview' ? 'active' : '' ?>"
            data-page="overview">
             <span class="icon">🏠</span>
             <span>Dashboard</span>
         </a>
 
-        <a href="/dashboard?page=alerts"
+        <a href="#"
            class="nav-item <?= $activePage === 'alerts' ? 'active' : '' ?>"
            data-page="alerts">
             <span class="icon">🔔</span>
             <span>My Alerts</span>
         </a>
 
-        <a href="/dashboard?page=history"
+        <a href="#"
            class="nav-item <?= $activePage === 'history' ? 'active' : '' ?>"
            data-page="history">
             <span class="icon">🕘</span>
             <span>History</span>
         </a>
 
-        <a href="/dashboard?page=subscriptions"
+        <a href="#"
            class="nav-item <?= $activePage === 'subscriptions' ? 'active' : '' ?>"
            data-page="subscriptions">
             <span class="icon">💳</span>
             <span>Subscriptions</span>
         </a>
-        <a href="/dashboard?page=settings"
-           class="nav-item <?= $activePage === 'settings' ? 'active' : '' ?>"
+
+        <a href="#"
+           class="nav-item <?= $activePage === 'pages/settings' ? 'active' : '' ?>"
            data-page="settings">
             <span class="icon">⚙️</span>
             <span>Settings</span>
@@ -63,11 +53,11 @@ error_reporting(E_ALL);
     <div class="sidebar-footer">
         <div class="user-info">
             <div class="avatar">
-                <?= strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?>
+                <?= strtoupper(substr($_SESSION['full_name'] ?? 'U', 0, 1)) ?>
             </div>
             <div>
                 <div class="user-name">
-                    <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
+                    <?= htmlspecialchars($_SESSION['full_name'] ?? 'User') ?>
                 </div>
                 <div class="user-plan">
                     <?= htmlspecialchars($_SESSION['plan_name'] ?? 'Free Plan') ?>
@@ -75,7 +65,9 @@ error_reporting(E_ALL);
             </div>
         </div>
 
-        <a href="/logout" class="logout-btn">Logout</a>
+        <button id="logoutBtn" class="logout-btn" type="button">
+            Logout
+        </button>
     </div>
 
 </aside>

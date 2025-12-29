@@ -3,10 +3,14 @@
    ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
+
     const navItems = document.querySelectorAll(".nav-item");
     const content  = document.getElementById("dashboard-content");
 
+    if (!content) return;
+
     function loadPage(page, pushState = true) {
+
         fetch(`/dashboard/load?page=${encodeURIComponent(page)}`, {
             credentials: "same-origin"
         })
@@ -31,10 +35,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
         .catch(() => {
-            content.innerHTML = "<p>Error loading section</p>";
+            content.innerHTML = "<p class='error'>Error loading section</p>";
         });
     }
 
+    // Sidebar navigation
     navItems.forEach(item => {
         item.addEventListener("click", e => {
             e.preventDefault();
@@ -43,21 +48,71 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // Browser back/forward
     window.addEventListener("popstate", () => {
         const page = new URLSearchParams(location.search).get("page") || "alerts";
         loadPage(page, false);
     });
 
+    // Initial page load
     const initialPage = new URLSearchParams(location.search).get("page");
-    if (initialPage) loadPage(initialPage, false);
+    if (initialPage) {
+        loadPage(initialPage, false);
+    }
+
+    // Expose loader for reuse
+    window.loadDashboardPage = loadPage;
 });
 
+/* =========================================================
+   CREATE ALERT BUTTON (OPEN CREATE_ALERT.PHP VIA AJAX)
+   ========================================================= */
+
+document.addEventListener("click", e => {
+    const btn = e.target.closest("#createAlertBtn");
+    if (!btn) return;
+
+    e.preventDefault();
+
+    if (typeof window.loadDashboardPage === "function") {
+        window.loadDashboardPage("create-alert");
+    }
+});
+
+
+/* =========================================================
+   CREATE ALERT → NEXT → CONFIRM PAGE
+   ========================================================= */
+
+document.addEventListener("click", e => {
+
+    const nextBtn = e.target.closest("#nextCreateAlertBtn");
+    if (!nextBtn) return;
+
+    e.preventDefault();
+
+    // Optional: validate required fields before moving next
+    const form = document.querySelector(".create-alert-page form");
+    if (!form) return;
+
+    // (Optional validation example)
+    // if (!form.checkValidity()) {
+    //     alert("Please fill all required fields");
+    //     return;
+    // }
+
+    // Load confirm page via AJAX
+    if (typeof window.loadDashboardPage === "function") {
+        window.loadDashboardPage("create_alert_confirm");
+    }
+});
 
 /* =========================================================
    WEATHER CONDITION SELECTION
    ========================================================= */
 
 document.addEventListener("click", e => {
+
     const card = e.target.closest(".condition-card");
     if (!card) return;
 
@@ -88,6 +143,7 @@ function initCityAutocomplete() {
 
     if (!input || !list) return;
     if (input.dataset.initialized === "true") return;
+
     input.dataset.initialized = "true";
 
     const cityNameInput = document.getElementById("city_name");
@@ -97,22 +153,27 @@ function initCityAutocomplete() {
     let debounceTimer = null;
 
     input.addEventListener("input", () => {
+
         const query = input.value.trim();
         list.innerHTML = "";
 
         if (query.length < 3) return;
 
         clearTimeout(debounceTimer);
+
         debounceTimer = setTimeout(() => {
+
             fetch(
                 `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
             )
             .then(res => res.json())
             .then(data => {
+
                 list.innerHTML = "";
                 if (!Array.isArray(data)) return;
 
                 data.forEach(city => {
+
                     const li = document.createElement("li");
                     li.textContent =
                         `${city.name}${city.state ? ", " + city.state : ""}, ${city.country}`;
@@ -128,7 +189,7 @@ function initCityAutocomplete() {
                     list.appendChild(li);
                 });
             })
-            .catch(console.error);
+            .catch(() => {});
         }, 300);
     });
 
@@ -138,10 +199,30 @@ function initCityAutocomplete() {
         }
     });
 }
+/* =========================================================
+   POPULATE CONFIRM PREVIEW
+   ========================================================= */
+
+function initConfirmPreview() {
+
+    const data = sessionStorage.getItem("createAlertData");
+    if (!data) return;
+
+    const alert = JSON.parse(data);
+
+    document.getElementById("preview-city").textContent =
+        alert.city_name || "—";
+
+    document.getElementById("preview-condition").textContent =
+        alert.condition || "—";
+
+    document.getElementById("preview-threshold").textContent =
+        alert.threshold || "—";
+}
 
 
 /* =========================================================
-   CREATE ALERT → CONFIRM (AJAX POST)
+   CREATE ALERT FORM (AJAX SUBMIT)
    ========================================================= */
 
 function initCreateAlertForm() {
@@ -152,59 +233,59 @@ function initCreateAlertForm() {
     form.dataset.bound = "true";
 
     form.addEventListener("submit", e => {
+
         e.preventDefault();
 
         const formData = new FormData(form);
-        formData.append("page", "create_alert_confirm");
 
-        fetch("/dashboard/load", {
+        fetch("/api/alerts/create", {
             method: "POST",
             body: formData,
             credentials: "same-origin"
         })
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById("dashboard-content").innerHTML = html;
-            initCreateAlertConfirm();
+        .then(res => {
+            if (!res.ok) throw new Error("Failed");
+            return res.json();
+        })
+        .then(() => {
+            // Reload alerts list after success
+            window.loadDashboardPage("alerts");
         })
         .catch(() => {
-            alert("Failed to load confirmation page");
+            alert("Failed to create alert. Please try again.");
         });
     });
 }
-
 
 /* =========================================================
-   CONFIRM PAGE → STORE ALERT (FIXED)
+   CREATE ALERT → NEXT → CONFIRM (SAVE DATA)
    ========================================================= */
 
-function initCreateAlertConfirm() {
+document.addEventListener("click", e => {
 
-    const btn  = document.getElementById("confirmCreateAlert");
-    const form = document.getElementById("confirmForm");
+    const nextBtn = e.target.closest("#nextCreateAlertBtn");
+    if (!nextBtn) return;
 
-    if (!btn || !form) return;
-    if (btn.dataset.bound === "true") return;
+    e.preventDefault();
 
-    btn.dataset.bound = "true";
+    const form = document.getElementById("createAlertForm");
+    if (!form) return;
 
-    btn.addEventListener("click", () => {
+    // Basic validation
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
 
-        const data = new FormData(form);
-        data.append("page", "create-alert-store");
-
-        fetch("/dashboard/load", {
-            method: "POST",
-            body: data,
-            credentials: "same-origin"
-        })
-        .then(res => {
-            if (!res.ok) throw new Error("Insert failed");
-            window.location.href = "/dashboard?page=alerts";
-        })
-        .catch(err => {
-            console.error(err);
-            alert("Failed to create alert");
-        });
+    // Collect form data
+    const data = {};
+    new FormData(form).forEach((value, key) => {
+        data[key] = value;
     });
-}
+
+    // Save to sessionStorage
+    sessionStorage.setItem("createAlertData", JSON.stringify(data));
+
+    // Load confirm page
+    window.loadDashboardPage("create_alert_confirm");
+});

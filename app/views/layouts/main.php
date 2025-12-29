@@ -2,20 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?= $title ?? 'WeatherGuard' ?></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?= htmlspecialchars($title ?? 'WeatherNotify') ?></title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/home.css">
+        <link rel="stylesheet" href="/assets/css/navbar.css">
+        <link rel="stylesheet" href="/assets/css/footer.css">
+        <link rel="stylesheet" href="/assets/css/auth.css">
+        <link rel="stylesheet" href="/assets/css/pricing.css">
+        <link rel="stylesheet" href="">
+
+
+
 </head>
 <body>
 
 <?php require __DIR__ . '/../partials/navbar.php'; ?>
 
-<?= $content ?>
+
+<main>
+    <?= $content ?> 
+</main>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -6,35 +6,17 @@
     <link rel="stylesheet" href="/assets/css/auth.css">
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    
+    <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
 </head>
 <body>
-
-<main class="container">
-    <!-- LEFT HERO -->
-    <section class="hero">
-        <div class="logo">🌩 WeatherNotify</div>
-
-        <h1>Monitor the skies<br>with precision.</h1>
-        <p>
-            Real-time alerts and detailed forecasts to keep you one
-            step ahead of the storm.
-        </p>
-    </section>
-
-    <!-- RIGHT CARD -->
-    <section class="card">
+    <main class="page-wrapper">
+<div class="auth-wrapper">
+<section class="card">
         <h2>Welcome back</h2>
         <p>Please enter your details to sign in.</p>
 
-        <?php if (!empty($error)): ?>
-            <div class="error">
-                <?= htmlspecialchars($error) ?>
-            </div>
-        <?php endif; ?>
-
-        <form method="post" action="/login">
+        <form id="loginForm" novalidate>
 
             <label>Email Address</label>
             <input type="email" name="email" placeholder="user@example.com" required>
@@ -57,8 +39,8 @@
             </p>
         </form>
     </section>
+</div>
 </main>
-
-<script src="/assets/js/login.js"></script>
+<script src="/assets/js/auth/login.js"></script>
 </body>
 </html>
