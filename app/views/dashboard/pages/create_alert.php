@@ -38,38 +38,54 @@
         <input type="hidden" id="condition" value="temperature">
 
         <div class="condition-grid">
-            <button type="button" class="condition-card active" data-condition="temperature">
+            <button type="button" 
+            class="condition-card active" 
+            data-condition="temperature"
+            aria-pressed="false">
                 🌡 <strong>Temperature</strong>
                 <span>Heat or Freeze</span>
             </button>
 
-            <button type="button" class="condition-card" data-condition="precipitation">
+            <button type="button" 
+            class="condition-card" 
+            data-condition="precipitation"
+            aria-pressed="false">
                 💧 <strong>Precipitation</strong>
                 <span>Rain or Snow</span>
             </button>
 
-            <button type="button" class="condition-card" data-condition="storm">
+            <button type="button" 
+            class="condition-card" 
+            data-condition="storm"
+            aria-pressed="false">
                 🌩 <strong>Storm</strong>
                 <span>Severe Weather</span>
             </button>
 
-            <button type="button" class="condition-card" data-condition="wind">
+            <button type="button" 
+            class="condition-card" 
+            data-condition="wind"
+            aria-pressed="false">
                 🌬 <strong>Wind Speed</strong>
                 <span>High Winds</span>
             </button>
 
-            <button type="button" class="condition-card" data-condition="uv">
+            <button type="button" class="condition-card" data-condition="uv" aria-pressed="false">
                 ☀ <strong>UV Index</strong>
                 <span>Sun Exposure</span>
             </button>
         </div>
+        <div class="condition-summary" id="conditionSummary">
+            Alert will trigger based on <strong>temperature</strong> conditions.
     </div>
-
+    </div>
+    
+    
     <!-- Threshold -->
     <div class="form-section">
-        <label class="section-title">⚙ Set Threshold</label>
+        <label class="section-title" id="thresholdTitle">⚙ Set Threshold</label>
 
-        <div class="threshold-row">
+        <div class="threshold-row" id="thresholdRow">
             <select class="input" id="operator" required>
                 <option value=">">Above (>)</option>
                 <option value="<">Below (&lt;)</option>

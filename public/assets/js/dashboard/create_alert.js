@@ -1,3 +1,24 @@
+const CONDITION_CONFIG = {
+    temperature: {
+        unit: "°C",
+        step: 0.1,
+        default: 30,
+        operators: [">", "<"]
+    },
+    precipitation: {
+        unit: "mm",
+        step: 1,
+        default: 40,
+        operators: [">"]
+    },
+    uv: {
+        unit: "",
+        step: 1,
+        default: 6,
+        operators: [">"]
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('createAlertForm');
     if (!form) return;
@@ -9,13 +30,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 .forEach(c => c.classList.remove('active'));
 
             card.classList.add('active');
-            document.getElementById('condition').value = card.dataset.condition;
+
+            const condition = card.dataset.condition;
+            document.getElementById('condition').value = condition;
+
+            updateThresholdUI(condition);
         });
     });
+
+    // Initialize default state
+    updateThresholdUI('temperature');
 
     // Submit handler
     form.addEventListener('submit', (e) => {
         e.preventDefault();
+
+        const thresholdValue = document.getElementById('threshold').value;
 
         const data = {
             city_name: document.getElementById('city_name').value,
@@ -23,19 +53,16 @@ document.addEventListener('DOMContentLoaded', () => {
             lon: document.getElementById('lon').value,
             condition: document.getElementById('condition').value,
             operator: document.getElementById('operator').value,
-            threshold: document.getElementById('threshold').value
+            threshold: Number(thresholdValue)
         };
 
-        // Basic validation
-        if (!data.city_name || !data.condition || !data.threshold) {
+        if (!data.city_name || !data.condition || thresholdValue === '') {
             alert('Please complete all required fields.');
             return;
         }
 
-        // Store globally for confirm page
         window.createAlertData = data;
 
-        // Load confirm page via dashboard loader
         fetch('/dashboard/load?page=create_alert_confirm', {
             credentials: 'same-origin'
         })
@@ -45,3 +72,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+function updateThresholdUI(condition) {
+    const config = CONDITION_CONFIG[condition];
+    if (!config) return;
+
+    const thresholdInput = document.getElementById('threshold');
+    const operatorSelect = document.getElementById('operator');
+    const unitSpan = document.querySelector('.unit');
+
+    if (unitSpan) {
+        unitSpan.textContent = config.unit;
+    }
+
+    thresholdInput.step = config.step;
+    thresholdInput.value = config.default;
+    thresholdInput.disabled = false;
+
+    operatorSelect.innerHTML = '';
+    config.operators.forEach(op => {
+        const option = document.createElement('option');
+        option.value = op;
+        option.textContent =
+            op === '>' ? 'Above (>)' :
+            op === '<' ? 'Below (<)' :
+            'Equals (=)';
+        operatorSelect.appendChild(option);
+    });
+}

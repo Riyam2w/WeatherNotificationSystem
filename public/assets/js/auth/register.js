@@ -1,98 +1,86 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('registerForm');
     if (!form) return;
 
-    const messageBox = document.getElementById('formMessage');
-    const csrfToken =
-        document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const nameField     = document.getElementById('full_name');
+    const emailField    = document.getElementById('email');
+    const passwordField = document.getElementById('password');
+    const confirmField  = document.getElementById('confirm_password');
 
-    const nameField = form.querySelector('input[name="full_name"]');
-    const emailField = form.querySelector('input[name="email"]');
-    const passwordField = document.getElementById('password-field');
-    const confirmField = document.getElementById('confirm-password-field');
-
-    /* --------------------------------
-       Password Toggle Helper
-    -------------------------------- */
+    /* =========================
+       Password Toggle
+    ========================= */
     function togglePassword(fieldId, toggleId) {
         const field = document.getElementById(fieldId);
         const toggle = document.getElementById(toggleId);
         if (!field || !toggle) return;
 
         toggle.addEventListener('click', () => {
-            const isPassword = field.type === 'password';
-            field.type = isPassword ? 'text' : 'password';
+            field.type = field.type === 'password' ? 'text' : 'password';
             toggle.classList.toggle('fa-eye');
             toggle.classList.toggle('fa-eye-slash');
         });
     }
 
-    togglePassword('password-field', 'togglePassword');
-    togglePassword('confirm-password-field', 'toggleConfirmPassword');
+    togglePassword('password', 'togglePassword');
+    togglePassword('confirm_password', 'toggleConfirmPassword');
 
-    /* --------------------------------
-       Client-side Validators
-    -------------------------------- */
-    function isValidName(name) {
-        return /^[A-Za-z ]+$/.test(name) && name.length >= 3;
+    /* =========================
+       Error Helpers
+    ========================= */
+    function clearErrors() {
+        document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+        document.querySelectorAll('input').forEach(el => el.classList.remove('error'));
     }
 
-    function isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    function showError(field, message) {
+        const errorEl = document.getElementById(`error_${field}`);
+        const inputEl = document.getElementById(field);
+        if (errorEl) errorEl.textContent = message;
+        if (inputEl) inputEl.classList.add('error');
     }
 
+    /* =========================
+       Validation
+    ========================= */
     function validateForm() {
-        const errors = [];
+        clearErrors();
+        let valid = true;
 
         const name = nameField.value.trim();
         const email = emailField.value.trim();
         const password = passwordField.value;
         const confirm = confirmField.value;
 
-        if (!name) {
-            errors.push('Full name is required.');
-        } else if (!isValidName(name)) {
-            errors.push('Name must contain only letters and be at least 3 characters.');
+        if (!name || name.length < 3) {
+            showError('full_name', 'Name must be at least 3 letters.');
+            valid = false;
         }
 
-        if (!email) {
-            errors.push('Email is required.');
-        } else if (!isValidEmail(email)) {
-            errors.push('Please enter a valid email address.');
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showError('email', 'Enter a valid email.');
+            valid = false;
         }
 
-        if (!password) {
-            errors.push('Password is required.');
-        } else if (password.length < 6) {
-            errors.push('Password must be at least 6 characters.');
+        if (!password || password.length < 6) {
+            showError('password', 'Password must be at least 6 characters.');
+            valid = false;
         }
 
-        if (!confirm) {
-            errors.push('Please confirm your password.');
-        } else if (password !== confirm) {
-            errors.push('Passwords do not match.');
+        if (password !== confirm) {
+            showError('confirm_password', 'Passwords do not match.');
+            valid = false;
         }
 
-        return errors;
+        return valid;
     }
 
-    /* --------------------------------
-       AJAX Register Submit
-    -------------------------------- */
-    form.addEventListener('submit', async function (e) {
+    /* =========================
+       Submit
+    ========================= */
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        messageBox.innerHTML = '';
-
-        const errors = validateForm();
-
-        if (errors.length > 0) {
-            messageBox.innerHTML = `
-                <div class="error">
-                    ${errors.map(e => `<p>${e}</p>`).join('')}
-                </div>
-            `;
-            return;
-        }
+        if (!validateForm()) return;
 
         const formData = new FormData(form);
 
@@ -101,34 +89,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 method: 'POST',
                 body: formData,
                 credentials: 'same-origin',
-                headers: {
-                    'X-CSRF-Token': csrfToken,
-                    'Accept': 'application/json'
-                }
+                headers: { 'Accept': 'application/json' }
             });
 
-            const data = await response.json();
+            const text = await response.text();
+            const data = text ? JSON.parse(text) : {};
 
-            if (!response.ok || !data.success) {
-                const serverErrors = data.errors
-                    ? Object.values(data.errors).join('<br>')
-                    : (data.error || 'Registration failed');
-
-                messageBox.innerHTML =
-                    `<div class="error">${serverErrors}</div>`;
+            if (!response.ok || data.success === false) {
+                if (data.errors) {
+                    Object.entries(data.errors).forEach(([field, msg]) =>
+                        showError(field, msg)
+                    );
+                }
                 return;
             }
 
-            messageBox.innerHTML =
-                `<div class="success">${data.message || 'Registration successful'}</div>`;
-
-            setTimeout(() => {
-                window.location.href = '/login';
-            }, 1200);
+            window.location.href = '/login';
 
         } catch (err) {
-            messageBox.innerHTML =
-                `<div class="error">Network error. Please try again.</div>`;
+            console.error('Registration failed:', err);
         }
     });
 });

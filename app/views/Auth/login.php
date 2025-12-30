@@ -33,7 +33,7 @@
 
             <button type="submit">Sign in</button>
 
-            <p class="switch">
+            <p class="auth-switch">
                 Don’t have an account?
                 <a href="/register">Sign up for free</a>
             </p>

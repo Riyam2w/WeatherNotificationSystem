@@ -456,3 +456,69 @@
         text-align: center;
     }
 }
+
+/* =========================================================
+   CREATE ALERT – NEW UI ADDITIONS (NON-BREAKING)
+   ========================================================= */
+
+/* Condition summary box */
+.condition-summary {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-left: 3px solid #2563eb;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #334155;
+}
+
+/* Improve condition card hover */
+.condition-card:hover {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+/* Accessibility: pressed state */
+.condition-card[aria-pressed="true"] {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+/* Threshold title (dynamic text) */
+#thresholdTitle {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* Threshold help text */
+#thresholdHelp {
+    display: block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* Disabled threshold input (storm case) */
+#threshold:disabled {
+    background: #f8fafc;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* Hide unit when empty (UV / storm) */
+.unit:empty {
+    display: none;
+}
+
+/* Smooth transitions */
+.condition-card,
+.btn,
+.input {
+    transition: all 0.2s ease;
+}
+
+/* Prevent autocomplete overlapping cards */
+.autocomplete-list {
+    position: relative;
+    z-index: 20;
+}

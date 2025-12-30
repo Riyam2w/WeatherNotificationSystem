@@ -20,36 +20,21 @@ class ApiValidator
         }
         return $this;
     }
-
-    public function phone(string $field, string $value): self
-    {
-        if (!Validator::phone($value)) {
-            $this->errors[$field] = 'Invalid phone number.';
-        }
-        return $this;
-    }
-
-    public function range(
-        string $field,
-        float|int|null $value,
-        float|int $min,
-        float|int $max
-    ): self {
-        if (!Validator::range($value, $min, $max)) {
-            $this->errors[$field] =
-                "Value must be between {$min} and {$max}.";
-        }
-        return $this;
-    }
-
     public function password(string $field, string $value): self
     {
         if (!Validator::password($value)) {
             $this->errors[$field] =
-                'Password must contain letters and numbers.';
+                'Password must be at least 6 characters long and contain both letters and numbers.';
         }
         return $this;
     }
+
+    public function addError(string $field, string $message): self
+    {
+        $this->errors[$field] = $message;
+        return $this;
+    }
+    
 
     public function fails(): bool
     {

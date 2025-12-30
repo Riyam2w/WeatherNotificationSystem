@@ -17,7 +17,7 @@
         <h2>Create your account</h2>
         <p>Start receiving real-time weather alerts today.</p>
 
-        <div id="formMessage"></div>
+        <!-- <div id="formMessage"></div> -->
 
         <form id="registerForm" novalidate>
 
@@ -26,42 +26,44 @@
                 type="text"
                 name="full_name"
                 placeholder="Enter your full name"
+                id="full_name"
                 required
             >
-
+            <small class="field-error" id="error_full_name"></small>
             <label>Email Address</label>
             <input
                 type="email"
                 name="email"
                 placeholder="user@example.com"
+                id="email"
                 required
             >
-
+            <small class="field-error" id="error_email"></small>
             <label>Password</label>
             <div class="password">
                 <input
                     type="password"
                     name="password"
-                    id="password-field"
+                    id="password"
                     required
                 >
                 <span id="togglePassword" class="fa fa-eye-slash"></span>
             </div>
-
+            <small class="field-error" id="error_password"></small>
             <label>Confirm Password</label>
             <div class="password">
                 <input
                     type="password"
                     name="confirm_password"
-                    id="confirm-password-field"
+                    id="confirm_password"
                     required
                 >
                 <span id="toggleConfirmPassword" class="fa fa-eye-slash"></span>
             </div>
-
+            <small class="field-error" id="error_confirm_password"></small>
             <button type="submit">Create Account</button>
 
-            <p class="switch">
+            <p class="auth-switch">
                 Already have an account?
                 <a href="/login">Log in</a>
             </p>

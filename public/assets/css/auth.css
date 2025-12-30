@@ -150,17 +150,30 @@ button:hover {
     font-size: 13px;
     text-align: center;
     color: #64748b;
+    position: relative;
+
+}
+/* =========================================================
+   AUTH PAGE SWITCH LINK
+========================================================= */
+
+.auth-switch {
+    margin-top: 24px;
+    font-size: 13px;
+    text-align: center;
+    color: #64748b;
 }
 
-.switch a {
+.auth-switch a {
     color: #2563eb;
-    text-decoration: none;
     font-weight: 500;
+    text-decoration: none;
 }
 
-.switch a:hover {
+.auth-switch a:hover {
     text-decoration: underline;
 }
+
 
 /* =========================================================
    MOBILE RESPONSIVE
@@ -170,4 +183,15 @@ button:hover {
     .card {
         padding: 32px 24px;
     }
+}
+
+.field-error {
+    display: block;
+    color: #dc2626;        /* red */
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+input.error {
+    border-color: #dc2626;
 }

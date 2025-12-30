@@ -1,51 +1,78 @@
 document.addEventListener('DOMContentLoaded', () => {
     const data = window.createAlertData;
-    if (!data) return;
-
-    // Fill summary
-    document.getElementById('summaryCity').textContent = data.city_name;
-    document.getElementById('summaryCondition').textContent =
-        `${data.condition} ${data.operator} ${data.threshold}`;
-    document.getElementById('summaryThreshold').textContent =
-        `${data.operator} ${data.threshold}`;
-
-    // Fill hidden fields
-    for (const key in data) {
-        const el = document.getElementById(key);
-        if (el) el.value = data[key];
+    if (!data) {
+        alert('Alert data missing. Please go back.');
+        return;
     }
 
-    // Back button
-    document.getElementById('backBtn').addEventListener('click', () => {
-        history.back();
-    });
+    const cityEl = document.getElementById('summaryCity');
+    const conditionEl = document.getElementById('summaryCondition');
+    const thresholdEl = document.getElementById('summaryThreshold');
+    
+    if (cityEl) cityEl.textContent = data.city_name;
+    if (conditionEl) {
+        conditionEl.textContent = 
+            `${data.condition} ${data.operator} ${data.threshold}`;
+    }
+    if (thresholdEl) {
+        thresholdEl.textContent = 
+            `${data.operator} ${data.threshold}`;
+    }
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            fetch('/dashboard/load?page=create_alert', {
+                credentials: 'same-origin'
+            })
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('dashboard-content').innerHTML = html;
 
-    // Submit
-    document.getElementById('confirmAlertForm').addEventListener('submit', async (e) => {
+            }); 
+        });
+    }
+
+    const form = document.getElementById('confirmAlertForm');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const csrfToken =
             document.querySelector('meta[name="csrf-token"]')?.content || '';
+    // 
+        const payload = {
+            ...data,
+            alert_name: document.getElementById('alert_name')?.value || ''
+        };
 
-        const formData = new FormData(e.target);
+        try {
+            const res = await fetch('/alerts/create', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(csrfToken && { 'X-CSRF-TOKEN': csrfToken })
+                },
+                body: JSON.stringify(payload)
+            });
 
-        const res = await fetch('/api/alerts/create', {
-            method: 'POST',
-            body: formData,
-            credentials: 'same-origin',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken
+            const json = await res.json();
+
+            if (!res.ok || !json.success) {
+                alert(json.message || 'Failed to create alert');
+                return;
             }
-        });
 
-        const json = await res.json();
+            // Load alerts list (NO full reload)
+            const alertsRes = await fetch('/dashboard/load?page=alerts', {
+                credentials: 'same-origin'
+            });
+            const alertsHtml = await alertsRes.text();
+            document.getElementById('dashboard-content').innerHTML = alertsHtml;
 
-        if (!res.ok || !json.success) {
-            alert(json.error || 'Failed to create alert');
-            return;
+        } catch (err) {
+            alert('Network error. Please try again.');
         }
-
-        alert('Alert created successfully');
-        window.location.href = '/dashboard';
     });
 });

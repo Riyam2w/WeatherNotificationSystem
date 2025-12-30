@@ -44,6 +44,10 @@ class AuthController extends Controller
 
     public function register(): void
     {
+        $this->jsonHeader();
+        try {
+
+        
         $this->ensurePost();
 
         $name  = trim($_POST['full_name'] ?? '');
@@ -59,27 +63,37 @@ class AuthController extends Controller
           ->password('password', $pass);
 
         if (!Validator::name($name)) {
-            $v->errors()['full_name'] = 'Name must contain only letters.';
+            $v->addError('full_name', 'Name must contain only letters.');
         }
 
         if (!Validator::confirm($pass, $cpass)) {
-            $v->errors()['confirm_password'] = 'Passwords do not match.';
+            $v->addError('confirm_password', 'Passwords do not match.');
         }
 
         if ($v->fails()) {
-            $this->jsonError($v->errors());
+            $this->jsonError($v->errors(), 422);
             return;
         }
 
         $stmt = $this->conn->prepare(
             "SELECT id FROM users WHERE email = ? LIMIT 1"
         );
+        if(!$stmt) {
+            $this->jsonError('Database prepare failed (email check)', 500);
+            return;
+        }
         $stmt->bind_param("s", $email);
-        $stmt->execute();
+        if(!$stmt->execute()) {
+            $this->jsonError('Database execute failed (email check)', 500);
+            return;
+        }
+        
+        // $stmt->execute();
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
-            $this->jsonError(['email' => 'Email already registered.']);
+                   $this->jsonError(['email' => 'Email already registered.'], 422);
+
             return;
         }
 
@@ -89,11 +103,24 @@ class AuthController extends Controller
             "INSERT INTO users (full_name, email, password_hash)
              VALUES (?, ?, ?)"
         );
+        if(!$insert) {
+            $this->jsonError('Database prepare failed', 500);
+            return;
+        }
         $insert->bind_param("sss", $name, $email, $hash);
-        $insert->execute();
+
+        if (!$insert->execute()) {
+            $this->jsonError('Database insert failed', 500);
+            return;
+        }
 
         $this->jsonSuccess('Registration successful');
     }
+    catch(Throwable $e) {
+        print_r($e);
+        $this->jsonError('Internal server error', 500);
+    }
+}
 
     /* ==========================
        LOGIN (POST – AJAX)
@@ -102,7 +129,9 @@ class AuthController extends Controller
     public function login(): void
     {
         $this->jsonHeader();
-
+        try {
+            $this->ensurePost();
+      
         $email    = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
 
@@ -115,8 +144,15 @@ class AuthController extends Controller
             "SELECT id, full_name, password_hash
              FROM users WHERE email = ? LIMIT 1"
         );
+        if (!$stmt) {
+            throw new RuntimeException('DB prepare failed (login)');
+        }
         $stmt->bind_param("s", $email);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            throw new RuntimeException('DB execute failed (login)');
+
+        }
+        // $stmt->execute();
         $result = $stmt->get_result();
         $user   = $result->fetch_assoc();
 
@@ -134,8 +170,11 @@ class AuthController extends Controller
             'redirect' => '/dashboard'
         ]);
         exit;
+    } catch (Throwable $e){
+        $this->jsonError('Internal server error', 500);
+}
+        
     }
-
     /* ==========================
        LOGOUT (POST – AJAX)
        (NO REDIRECT HERE)
@@ -171,20 +210,24 @@ class AuthController extends Controller
         header('Content-Type: application/json');
     }
 
-    private function jsonError(array|string $error, int $code = 422): void
+    private function jsonError(array|string $errors, int $code = 422): void
     {
-        header('Content-Type: application/json');
+        // header('Content-Type: application/json');
         http_response_code($code);
+
+        if(is_string($errors)) {
+            $errors = ['general' => $errors];
+        }
         echo json_encode([
             'success' => false,
-            'error'   => $error
+            'errors'   => $errors
         ]);
         exit;
     }
 
     private function jsonSuccess(string $message): void
     {
-        header('Content-Type: application/json');
+        // header('Content-Type: application/json');
         echo json_encode([
             'success' => true,
             'message' => $message

@@ -1,10 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Central validation utility
- * Used by ApiValidator and Controllers
- */
 class Validator
 {
     /* =========================
@@ -66,24 +62,14 @@ class Validator
         return true;
     }
 
-    /* =========================
-       PHONE
-    ========================= */
-
-    /**
-     * Indian mobile numbers
-     * Starts with 6–9, exactly 10 digits
-     */
+    
     public static function phone(string $phone): bool
     {
         $phone = preg_replace('/\s+/', '', $phone);
         return preg_match('/^[6-9]\d{9}$/', $phone) === 1;
     }
 
-    /* =========================
-       NUMERIC / RANGE
-    ========================= */
-
+    
     public static function numeric(mixed $value): bool
     {
         return is_numeric($value);

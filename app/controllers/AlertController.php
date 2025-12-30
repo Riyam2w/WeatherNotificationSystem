@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../classes/Validator.php';
 require_once __DIR__ . '/../core/ApiValidator.php';
+require_once __DIR__ . '/../models/Plan.php';
 
 class AlertController
 {
@@ -13,9 +14,6 @@ class AlertController
         $this->conn = $conn;
     }
 
-    /* -------------------------------------------------
-       CREATE ALERT (API)
-    ------------------------------------------------- */
     public function store(): void
     {
         Auth::check();
@@ -24,32 +22,59 @@ class AlertController
             http_response_code(405);
             echo json_encode([
                 'success' => false,
-                'error'   => 'Method not allowed'
+                'message' => 'Method not allowed'
             ]);
             return;
         }
 
+        /* -------------------------
+           Parse JSON or Form Data
+        ------------------------- */
+        $input = $_POST;
+        if (empty($input)) {
+            $raw = file_get_contents('php://input');
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded)) {
+                $input = $decoded;
+            }
+        }
+
         $userId    = (int) $_SESSION['user_id'];
-        $cityName  = trim($_POST['city_name'] ?? '');
-        $lat       = $_POST['lat'] ?? null;
-        $lon       = $_POST['lon'] ?? null;
-        $condition = trim($_POST['condition'] ?? '');
-        $operator  = trim($_POST['operator'] ?? '');
-        $threshold = $_POST['threshold'] ?? null;
-        $alertName = trim($_POST['alert_name'] ?? '');
+        $cityName  = trim($input['city_name'] ?? '');
+        $lat       = $input['lat'] ?? null;
+        $lon       = $input['lon'] ?? null;
+        $condition = trim($input['condition'] ?? '');
+        $operator  = trim($input['operator'] ?? '');
+        $threshold = $input['threshold'] ?? null;
+        $alertName = trim($input['alert_name'] ?? '');
 
         /* -------------------------
-           API Validation Layer
+           Plan Enforcement
+        ------------------------- */
+        if (!Plan::canCreateAlert($this->conn, $userId)) {
+            http_response_code(403);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Alert limit reached. Please upgrade your plan.'
+            ]);
+            return;
+        }
+
+        /* -------------------------
+           Validation
         ------------------------- */
         $v = new ApiValidator();
 
         $v->require('city_name', $cityName)
           ->require('condition', $condition)
-          ->require('operator', $operator)
-          ->range('threshold', is_numeric($threshold) ? (float)$threshold : null, -100, 100);
+          ->require('operator', $operator);
 
-        if (!in_array($operator, ['>', '<'], true)) {
+        if (!in_array($operator, ['>', '<', '='], true)) {
             $v->errors()['operator'] = 'Invalid operator.';
+        }
+
+        if ($threshold !== null && !is_numeric($threshold)) {
+            $v->errors()['threshold'] = 'Threshold must be numeric.';
         }
 
         if (!Validator::range((float)$lat, -90, 90)) {
@@ -64,6 +89,7 @@ class AlertController
             http_response_code(422);
             echo json_encode([
                 'success' => false,
+                'message' => 'Validation failed',
                 'errors'  => $v->errors()
             ]);
             return;
@@ -79,7 +105,7 @@ class AlertController
         $this->conn->begin_transaction();
 
         try {
-            /* 1. Get or Insert City */
+            // City
             $stmt = $this->conn->prepare(
                 "SELECT id FROM cities WHERE name = ? LIMIT 1"
             );
@@ -100,7 +126,7 @@ class AlertController
                 $cityId = $stmt->insert_id;
             }
 
-            /* 2. Condition ID */
+            // Condition
             $stmt = $this->conn->prepare(
                 "SELECT id FROM alert_conditions WHERE code = ? LIMIT 1"
             );
@@ -114,14 +140,14 @@ class AlertController
 
             $conditionId = (int) $res->fetch_assoc()['id'];
 
-            /* 3. Insert Alert */
+            // Alert
             $stmt = $this->conn->prepare(
                 "INSERT INTO alerts
                 (user_id, alert_name, city_id, condition_id, operator, threshold_value)
                 VALUES (?, ?, ?, ?, ?, ?)"
             );
 
-            $threshold = (float)$threshold;
+            $threshold = $threshold !== null ? (float)$threshold : 0.0;
 
             $stmt->bind_param(
                 "isiisd",
@@ -134,7 +160,6 @@ class AlertController
             );
 
             $stmt->execute();
-
             $this->conn->commit();
 
             echo json_encode([
@@ -147,7 +172,7 @@ class AlertController
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'error'   => 'Failed to create alert'
+                'message' => 'Failed to create alert'
             ]);
         }
     }
