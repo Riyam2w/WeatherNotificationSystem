@@ -28,12 +28,8 @@ class Router
         }
     }
 
-    private function add(
-        string $method,
-        string $uri,
-        string $handler,
-        array $middlewares
-    ): void {
+    private function add(string $method, string $uri, string $handler, array $middlewares): void
+    {
         $uri = '/' . trim($uri, '/');
 
         $this->routes[$method][$uri] = [
@@ -45,18 +41,41 @@ class Router
     public function dispatch(): void
     {
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
-        $uri    = '/' . trim($uri, '/');
+
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
+
+        // ✅ REMOVE /public FROM URI IF PRESENT
+        $uri = preg_replace('#^/public#', '', $uri);
+        $uri = '/' . trim($uri, '/');
 
         $route = $this->routes[$method][$uri] ?? null;
 
         if (!$route) {
             http_response_code(404);
-            echo "404 Not Found: {$method} {$uri}";
+
+            if (
+                isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+            ) {
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => false,
+                    'error'   => "Route not found: {$method} {$uri}"
+                ]);
+            } else {
+                echo "404 Not Found: {$method} {$uri}";
+            }
             return;
         }
 
+        // ==========================
+        // MIDDLEWARE EXECUTION
+        // ==========================
         foreach ($route['middlewares'] as $middleware) {
+            if (!class_exists($middleware)) {
+                throw new RuntimeException("Middleware {$middleware} not found");
+            }
+
             $middlewareInstance = new $middleware();
 
             if (!method_exists($middlewareInstance, 'handle')) {
@@ -64,8 +83,16 @@ class Router
             }
 
             $middlewareInstance->handle();
+
+            // If middleware redirected or exited
+            if (headers_sent()) {
+                return;
+            }
         }
 
+        // ==========================
+        // CONTROLLER EXECUTION
+        // ==========================
         [$controller, $action] = explode('@', $route['handler'], 2);
 
         if (!class_exists($controller)) {

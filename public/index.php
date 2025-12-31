@@ -1,8 +1,10 @@
 <?php
 declare(strict_types=1);
-ini_set('display_errors', '1');
-ini_set('log_errors', '1');
+
 error_reporting(E_ALL);
+ini_set('display_errors', '1');
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
 
 /* Session */
 if (session_status() === PHP_SESSION_NONE) {
@@ -28,11 +30,11 @@ if (!($conn instanceof mysqli)) {
 require_once __DIR__ . '/../app/core/Controller.php';
 require_once __DIR__ . '/../app/core/Auth.php';
 require_once __DIR__ . '/../app/core/Router.php';
-require_once __DIR__ . '/../app/controllers/PricingController.php';
 
 
 /* Controllers */
 require_once __DIR__ . '/../app/controllers/HomeController.php';
+require_once __DIR__ . '/../app/controllers/PricingController.php';
 require_once __DIR__ . '/../app/controllers/AuthController.php';
 require_once __DIR__ . '/../app/controllers/DashboardController.php';
 require_once __DIR__ . '/../app/controllers/AlertController.php';

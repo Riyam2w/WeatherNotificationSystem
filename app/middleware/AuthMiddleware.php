@@ -5,6 +5,7 @@ class AuthMiddleware implements MiddlewareInterface
 {
     public function handle(): void
     {
-        Auth::check(); // AJAX-safe
+        Auth::check(); 
+        // AJAX-safe
     }
 }

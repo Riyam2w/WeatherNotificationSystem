@@ -2,7 +2,9 @@
 
 <form id="createAlertForm" novalidate>
 
-    <!-- Header -->
+    <!-- ======================
+         Header
+    ======================= -->
     <div class="create-alert-header">
         <div>
             <h1>Create New Alert</h1>
@@ -10,7 +12,9 @@
         </div>
     </div>
 
-    <!-- Location -->
+    <!-- ======================
+         Location
+    ======================= -->
     <div class="form-section">
         <label class="section-title">📍 Location</label>
 
@@ -23,95 +27,92 @@
 
         <ul id="cityResults" class="autocomplete-list"></ul>
 
-        <!-- Hidden fields -->
-        <input type="hidden" id="city_name">
-        <input type="hidden" id="lat">
-        <input type="hidden" id="lon">
+        <!-- Hidden POST fields -->
+        <input type="hidden" id="city_name" name="city_name">
+        <input type="hidden" id="lat" name="lat">
+        <input type="hidden" id="lon" name="lon">
 
         <small>Start typing and select a city.</small>
     </div>
 
-    <!-- Weather Condition -->
+    <!-- ======================
+         Weather Condition
+    ======================= -->
     <div class="form-section">
         <label class="section-title">🌦 Weather Condition</label>
 
-        <input type="hidden" id="condition" value="temperature">
+        <!-- No default condition -->
+        <input type="hidden" id="condition" name="condition" value="">
 
         <div class="condition-grid">
-            <button type="button" 
-            class="condition-card active" 
-            data-condition="temperature"
-            aria-pressed="false">
-                🌡 <strong>Temperature</strong>
-                <span>Heat or Freeze</span>
-            </button>
 
-            <button type="button" 
-            class="condition-card" 
-            data-condition="precipitation"
-            aria-pressed="false">
-                💧 <strong>Precipitation</strong>
-                <span>Rain or Snow</span>
-            </button>
+            <?php
+            $conditions = [
+                'temperature'   => ['🌡', 'Temperature', 'Heat or Freeze'],
+                'precipitation' => ['💧', 'Precipitation', 'Rain or Snow'],
+                'storm'         => ['🌩', 'Storm', 'Severe Weather'],
+                'wind'          => ['🌬', 'Wind Speed', 'High Winds'],
+                'uv'            => ['☀', 'UV Index', 'Sun Exposure'],
+            ];
+            foreach ($conditions as $key => [$icon, $title, $desc]): ?>
+                <button type="button"
+                        class="condition-card"
+                        data-condition="<?= $key ?>"
+                        aria-pressed="false">
+                    <?= $icon ?> <strong><?= $title ?></strong>
+                    <span><?= $desc ?></span>
+                </button>
+            <?php endforeach; ?>
 
-            <button type="button" 
-            class="condition-card" 
-            data-condition="storm"
-            aria-pressed="false">
-                🌩 <strong>Storm</strong>
-                <span>Severe Weather</span>
-            </button>
-
-            <button type="button" 
-            class="condition-card" 
-            data-condition="wind"
-            aria-pressed="false">
-                🌬 <strong>Wind Speed</strong>
-                <span>High Winds</span>
-            </button>
-
-            <button type="button" class="condition-card" data-condition="uv" aria-pressed="false">
-                ☀ <strong>UV Index</strong>
-                <span>Sun Exposure</span>
-            </button>
         </div>
-        <div class="condition-summary" id="conditionSummary">
-            Alert will trigger based on <strong>temperature</strong> conditions.
-    </div>
-    </div>
-    
-    
-    <!-- Threshold -->
-    <div class="form-section">
-        <label class="section-title" id="thresholdTitle">⚙ Set Threshold</label>
 
-        <div class="threshold-row" id="thresholdRow">
-            <select class="input" id="operator" required>
-                <option value=">">Above (>)</option>
+        <div class="condition-summary" id="conditionSummary">
+            Please select a weather condition to continue.
+        </div>
+    </div>
+
+    <!-- ======================
+         Threshold
+    ======================= -->
+    <div class="form-section">
+        <label class="section-title">⚙ Set Threshold</label>
+
+        <div class="threshold-row">
+
+            <select class="input"
+                    id="operator"
+                    name="operator"
+                    disabled
+                    required>
+                <option value=">">Above (&gt;)</option>
                 <option value="<">Below (&lt;)</option>
             </select>
 
             <input type="number"
                    class="input"
                    id="threshold"
-                   value="30"
-                   step="0.1"
+                   name="threshold"
+                   disabled
                    required>
 
-            <span class="unit">°C</span>
+            <span class="unit"></span>
         </div>
 
         <small>
-            You will be notified immediately when the condition is met.
+            Threshold becomes active after selecting a condition.
         </small>
     </div>
 
-    <!-- Actions -->
+    <!-- ======================
+         Actions
+    ======================= -->
     <div class="form-actions">
-        <button type="submit" id="nextCreateAlertBtn" class="btn btn-primary">
+        <button type="submit"
+                class="btn btn-primary">
             Next
         </button>
     </div>
 
 </form>
+
 </section>

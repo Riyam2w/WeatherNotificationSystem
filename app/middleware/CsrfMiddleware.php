@@ -5,7 +5,11 @@ class CsrfMiddleware implements MiddlewareInterface
 {
     public function handle(): void
     {
-        $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+         if (!in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'], true)){
+            return;
+         }
+        $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? '');
 
         if (
             empty($token) ||
@@ -13,6 +17,7 @@ class CsrfMiddleware implements MiddlewareInterface
             !hash_equals($_SESSION['csrf_token'], $token)
         ) {
             http_response_code(403);
+            header('Content-Type: application/json');
             echo json_encode([
                 'success' => false,
                 'error'   => 'Invalid CSRF token'

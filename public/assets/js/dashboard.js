@@ -287,5 +287,5 @@ document.addEventListener("click", e => {
     sessionStorage.setItem("createAlertData", JSON.stringify(data));
 
     // Load confirm page
-    window.loadDashboardPage("create_alert_confirm");
+    window.loadDashboardPage("create-alert-confirm");
 });

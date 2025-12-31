@@ -44,4 +44,20 @@ class Plan
 
         return $plans;
     }
+    public function getActivePlan(int $userId): ?array
+    {
+        $stmt = $this->conn->prepare(
+            "SELECT p.name, s.expires_at 
+             FROM subscriptions s 
+             JOIN plans p ON p.id = s.plan_id
+             WHERE s.user_id = ? AND s.status='active'
+             LIMIT 1"
+        );
+
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+
+        return $result ?: null;
+    }
 }

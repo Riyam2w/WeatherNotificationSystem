@@ -3,6 +3,13 @@ declare(strict_types=1);
 
 class DashboardController extends Controller
 {
+    private mysqli $conn;
+
+    public function __construct(mysqli $conn)
+    {
+        $this->conn = $conn;
+    }
+
     /**
      * Loads the main dashboard shell
      */
@@ -16,7 +23,7 @@ class DashboardController extends Controller
                 'activePage' => $activePage,
                 'userName'   => $_SESSION['user_name'] ?? 'User',
             ],
-            'dashboard' // ✅ dashboard layout (no navbar/footer)
+            'dashboard'
         );
     }
 
@@ -25,26 +32,36 @@ class DashboardController extends Controller
      */
     public function load(): void
     {
-        header('Content-Type: text/html; charset=UTF-8');
-
         $page = $_GET['page'] ?? 'overview';
 
-        $map = [
-            'overview'      => 'overview.php',
-            'alerts'        => 'alerts.php',
-            'create-alert'  => 'create_alert.php',
-            'create_alert_confirm'  => 'create_alert_confirm.php',
-            'subscriptions' => 'subscriptions.php',
-            'settings'      => 'settings.php',
+        $pages = [
+            'overview'             => 'dashboard/pages/overview',
+            'alerts'               => 'dashboard/pages/alerts',
+            'create-alert'         => 'dashboard/pages/create_alert',
+            'create-alert-confirm' => 'dashboard/pages/create_alert_confirm',
+            'subscriptions'        => 'dashboard/pages/subscriptions',
+            'settings'             => 'dashboard/pages/settings',
         ];
 
-        if (!isset($map[$page])) {
+        if (!isset($pages[$page])) {
             http_response_code(400);
             echo 'Invalid page';
-            exit;
+            return;
+        }
+        $data = [];
+
+        if ($page === 'overview') {
+            require_once __DIR__ . '/../models/DashboardStats.php';
+
+            $stats = new DashboardStats($this->conn);
+            $data = $stats->getOverviewStats((int)$_SESSION['user_id']);
         }
 
-        require __DIR__ . '/../views/dashboard/pages/' . $map[$page];
-        exit;
+        // ✅ Render partial WITHOUT layout
+        $this->view(
+            $pages[$page],
+            $data,
+            null
+        );
     }
 }
