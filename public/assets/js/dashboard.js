@@ -21,11 +21,21 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(html => {
             content.innerHTML = html;
 
-            // Re-init dynamic features
-            initCityAutocomplete();
-            initCreateAlertForm();
+            /* Re-initialize dynamic features AFTER AJAX load */
+            if (typeof initCityAutocomplete === "function") {
+                initCityAutocomplete();
+            }
+            if (typeof initCreateAlertUI === "function") {
+                initCreateAlertUI();
+            }
+            if (typeof initCreateAlertForm === "function") {
+                initCreateAlertForm();
+            }
+            if (typeof initConfirmPreview === "function") {
+                initConfirmPreview();
+            }
 
-            // Sidebar active state
+            /* Sidebar active state */
             navItems.forEach(i => i.classList.remove("active"));
             const active = document.querySelector(`.nav-item[data-page="${page}"]`);
             if (active) active.classList.add("active");
@@ -39,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Sidebar navigation
+    /* Sidebar navigation */
     navItems.forEach(item => {
         item.addEventListener("click", e => {
             e.preventDefault();
@@ -48,24 +58,24 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Browser back/forward
+    /* Browser back / forward */
     window.addEventListener("popstate", () => {
         const page = new URLSearchParams(location.search).get("page") || "alerts";
         loadPage(page, false);
     });
 
-    // Initial page load
+    /* Initial page load */
     const initialPage = new URLSearchParams(location.search).get("page");
     if (initialPage) {
         loadPage(initialPage, false);
     }
 
-    // Expose loader for reuse
+    /* Expose loader globally */
     window.loadDashboardPage = loadPage;
 });
 
 /* =========================================================
-   CREATE ALERT BUTTON (OPEN CREATE_ALERT.PHP VIA AJAX)
+   CREATE ALERT BUTTON (OPEN CREATE PAGE)
    ========================================================= */
 
 document.addEventListener("click", e => {
@@ -73,15 +83,13 @@ document.addEventListener("click", e => {
     if (!btn) return;
 
     e.preventDefault();
-
     if (typeof window.loadDashboardPage === "function") {
         window.loadDashboardPage("create-alert");
     }
 });
 
-
 /* =========================================================
-   CREATE ALERT → NEXT → CONFIRM PAGE
+   CREATE ALERT → NEXT → CONFIRM (SAVE DATA)
    ========================================================= */
 
 document.addEventListener("click", e => {
@@ -91,44 +99,26 @@ document.addEventListener("click", e => {
 
     e.preventDefault();
 
-    // Optional: validate required fields before moving next
-    const form = document.querySelector(".create-alert-page form");
+    const form = document.getElementById("createAlertForm");
     if (!form) return;
 
-    // (Optional validation example)
-    // if (!form.checkValidity()) {
-    //     alert("Please fill all required fields");
-    //     return;
-    // }
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
 
-    // Load confirm page via AJAX
+    /* Save form data for preview */
+    const data = {};
+    new FormData(form).forEach((value, key) => {
+        data[key] = value;
+    });
+
+    sessionStorage.setItem("createAlertData", JSON.stringify(data));
+
     if (typeof window.loadDashboardPage === "function") {
-        window.loadDashboardPage("create_alert_confirm");
+        window.loadDashboardPage("create-alert-confirm");
     }
 });
-
-/* =========================================================
-   WEATHER CONDITION SELECTION
-   ========================================================= */
-
-document.addEventListener("click", e => {
-
-    const card = e.target.closest(".condition-card");
-    if (!card) return;
-
-    e.preventDefault();
-
-    document.querySelectorAll(".condition-card")
-        .forEach(c => c.classList.remove("active"));
-
-    card.classList.add("active");
-
-    const hiddenInput = document.getElementById("selected-condition");
-    if (hiddenInput) {
-        hiddenInput.value = card.dataset.condition;
-    }
-});
-
 
 /* =========================================================
    CITY AUTOCOMPLETE (OpenWeather GEO API)
@@ -141,9 +131,7 @@ function initCityAutocomplete() {
     const input = document.getElementById("citySearch");
     const list  = document.getElementById("cityResults");
 
-    if (!input || !list) return;
-    if (input.dataset.initialized === "true") return;
-
+    if (!input || !list || input.dataset.initialized === "true") return;
     input.dataset.initialized = "true";
 
     const cityNameInput = document.getElementById("city_name");
@@ -199,8 +187,9 @@ function initCityAutocomplete() {
         }
     });
 }
+
 /* =========================================================
-   POPULATE CONFIRM PREVIEW
+   CONFIRM PAGE PREVIEW
    ========================================================= */
 
 function initConfirmPreview() {
@@ -210,19 +199,26 @@ function initConfirmPreview() {
 
     const alert = JSON.parse(data);
 
-    document.getElementById("preview-city").textContent =
-        alert.city_name || "—";
+    const cityEl      = document.getElementById("preview-city");
+    const conditionEl = document.getElementById("preview-condition");
+    const thresholdEl = document.getElementById("preview-threshold");
 
-    document.getElementById("preview-condition").textContent =
-        alert.condition || "—";
-
-    document.getElementById("preview-threshold").textContent =
-        alert.threshold || "—";
+    if (cityEl) {
+        cityEl.textContent = alert.city_name || "—";
+    }
+    if (conditionEl) {
+        conditionEl.textContent = alert.condition_type || "—";
+    }
+    if (thresholdEl) {
+        thresholdEl.textContent =
+            alert.threshold && alert.unit
+                ? `${alert.threshold} ${alert.unit}`
+                : "—";
+    }
 }
 
-
 /* =========================================================
-   CREATE ALERT FORM (AJAX SUBMIT)
+   CREATE ALERT FORM (FINAL API SUBMIT)
    ========================================================= */
 
 function initCreateAlertForm() {
@@ -248,7 +244,7 @@ function initCreateAlertForm() {
             return res.json();
         })
         .then(() => {
-            // Reload alerts list after success
+            sessionStorage.removeItem("createAlertData");
             window.loadDashboardPage("alerts");
         })
         .catch(() => {
@@ -256,36 +252,3 @@ function initCreateAlertForm() {
         });
     });
 }
-
-/* =========================================================
-   CREATE ALERT → NEXT → CONFIRM (SAVE DATA)
-   ========================================================= */
-
-document.addEventListener("click", e => {
-
-    const nextBtn = e.target.closest("#nextCreateAlertBtn");
-    if (!nextBtn) return;
-
-    e.preventDefault();
-
-    const form = document.getElementById("createAlertForm");
-    if (!form) return;
-
-    // Basic validation
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-
-    // Collect form data
-    const data = {};
-    new FormData(form).forEach((value, key) => {
-        data[key] = value;
-    });
-
-    // Save to sessionStorage
-    sessionStorage.setItem("createAlertData", JSON.stringify(data));
-
-    // Load confirm page
-    window.loadDashboardPage("create-alert-confirm");
-});

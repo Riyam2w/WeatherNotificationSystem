@@ -2,9 +2,6 @@
 
 <form id="createAlertForm" novalidate>
 
-    <!-- ======================
-         Header
-    ======================= -->
     <div class="create-alert-header">
         <div>
             <h1>Create New Alert</h1>
@@ -12,9 +9,6 @@
         </div>
     </div>
 
-    <!-- ======================
-         Location
-    ======================= -->
     <div class="form-section">
         <label class="section-title">📍 Location</label>
 
@@ -22,27 +16,23 @@
                id="citySearch"
                class="input"
                placeholder="Search city (e.g. Delhi, London)"
-               autocomplete="off"
+               autocomplete="on"
                required>
 
         <ul id="cityResults" class="autocomplete-list"></ul>
 
-        <!-- Hidden POST fields -->
         <input type="hidden" id="city_name" name="city_name">
         <input type="hidden" id="lat" name="lat">
         <input type="hidden" id="lon" name="lon">
 
-        <small>Start typing and select a city.</small>
+        <!-- <small>Start typing and select a city.</small> -->
     </div>
 
-    <!-- ======================
-         Weather Condition
-    ======================= -->
     <div class="form-section">
         <label class="section-title">🌦 Weather Condition</label>
 
         <!-- No default condition -->
-        <input type="hidden" id="condition" name="condition" value="">
+        <input type="hidden" id="condition_type" name="condition_type">
 
         <div class="condition-grid">
 
@@ -70,10 +60,6 @@
             Please select a weather condition to continue.
         </div>
     </div>
-
-    <!-- ======================
-         Threshold
-    ======================= -->
     <div class="form-section">
         <label class="section-title">⚙ Set Threshold</label>
 
@@ -84,8 +70,8 @@
                     name="operator"
                     disabled
                     required>
-                <option value=">">Above (&gt;)</option>
-                <option value="<">Below (&lt;)</option>
+                <!-- <option value=">">Above (&gt;)</option>
+                <option value="<">Below (&lt;)</option> -->
             </select>
 
             <input type="number"
@@ -95,7 +81,12 @@
                    disabled
                    required>
 
-            <span class="unit"></span>
+            <!-- <span class="unit"></span> -->
+             <select 
+             class="input"
+              id="unit"
+              name="unit"
+              style="display:none"></select>
         </div>
 
         <small>
