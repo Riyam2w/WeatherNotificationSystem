@@ -16,6 +16,12 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 /* Database */
+require_once __DIR__ . '/../vendor/autoload.php';
+use Dotenv\Dotenv;
+
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
 require_once __DIR__ . '/../app/config/db.php';
 
 $db   = new Database();
@@ -39,6 +45,8 @@ require_once __DIR__ . '/../app/controllers/AuthController.php';
 require_once __DIR__ . '/../app/controllers/DashboardController.php';
 require_once __DIR__ . '/../app/controllers/AlertController.php';
 require_once __DIR__ . '/../app/controllers/LocationController.php';
+require_once __DIR__ . '/../app/controllers/PaymentController.php';
+require_once __DIR__ . '/../app/controllers/UserController.php';
 
 /* Middleware */
 require_once __DIR__ . '/../app/middleware/MiddlewareInterface.php';
@@ -49,6 +57,7 @@ $router = new Router($conn);
 
 /* HOME (CRITICAL) */
 $router->get('/', 'HomeController@index');
+$router->get('/features', 'HomeController@features');
 $router->get('/pricing', 'PricingController@index');
 
 /* Auth */
@@ -58,8 +67,7 @@ $router->post('/login', 'AuthController@login');
 $router->get('/register', 'AuthController@showRegister');
 $router->post('/register', 'AuthController@register');
 
-$router->get('/forget_password', 'AuthController@showForgotPassword');
-$router->post('/forget_password', 'AuthController@forgotPassword');
+
 
 $router->match(['GET','POST'], '/logout', 'AuthController@logout');
 
@@ -69,10 +77,24 @@ $router->get('/dashboard/load', 'DashboardController@load', [AuthMiddleware::cla
 
 /* API */
 $router->get('/api/locations', 'LocationController@index');
+$router->post('/api/locations/fetch', 'LocationController@store');
+
+// User API
+$router->post('/api/user/profile', 'UserController@updateProfile', [AuthMiddleware::class, CsrfMiddleware::class]);
+$router->post('/api/user/password', 'UserController@updatePassword', [AuthMiddleware::class, CsrfMiddleware::class]);
+
 $router->post(
     '/api/alerts/create',
     'AlertController@store',
     [AuthMiddleware::class, CsrfMiddleware::class]
 );
+
+$router->get('/alerts', 'AlertController@index', [AuthMiddleware::class]);
+$router->post('/api/alerts/delete/{id}', 'AlertController@delete', [AuthMiddleware::class]);
+
+/* Payments */
+$router->get('/checkout/{slug}', 'PaymentController@checkout', [AuthMiddleware::class]);
+$router->post('/payment/process', 'PaymentController@process', [AuthMiddleware::class]);
+$router->get('/payment/success', 'PaymentController@success', [AuthMiddleware::class]);
 
 $router->dispatch();

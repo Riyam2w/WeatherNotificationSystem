@@ -17,4 +17,11 @@ class HomeController extends Controller
             'plans' => $plans
         ]);
     }
+
+    public function features(): void
+    {
+        $this->view('home/features', [
+            'title' => 'Features | WeatherNotify'
+        ]);
+    }
 }

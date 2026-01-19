@@ -11,7 +11,7 @@ declare(strict_types=1);
 
     <div class="stat-card">
         <span class="stat-label">Total Alerts</span>
-        <strong class="stat-value"><?= $totalAAlerts ?></strong>
+        <strong class="stat-value"><?= $totalAlerts ?></strong>
     </div>
 
     <div class="stat-card">
@@ -22,14 +22,14 @@ declare(strict_types=1);
 
     <div class="stat-card">
         <span class="stat-label">Cities Monitored</span>
-        <strong class="stat-value"><?= $citiesCount ?></strong>
+        <strong class="stat-value"><?= $countCities ?></strong>
     </div>
 
     <div class="stat-card">
         <span class="stat-label">Current Plan</span>
         <strong class="stat-value"><?= htmlspecialchars($currentPlan['name'] ?? 'Free') ?></strong>
-        <?php if (!empty($currentPlan['expires_at'])): ?>
-            <small class="stat-sub">Expires on <?= date('d M Y', strtotime($currentPlan['expires_at'])) ?>
+        <?php if (!empty($currentPlan['valid_till'])): ?>
+            <small class="stat-sub">Expires on <?= date('d M Y', strtotime($currentPlan['valid_till'])) ?>
         </small>
         <?php endif; ?>
     </div>

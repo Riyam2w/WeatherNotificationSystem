@@ -1,23 +1,10 @@
 <?php
 declare(strict_types=1);
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-/*
- | Unset all session variables
- */
 $_SESSION = [];
-
-/*
- | Destroy the session
- */
 session_destroy();
-
-/*
- | Delete session cookie (important for security)
- */
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(
@@ -30,9 +17,5 @@ if (ini_get("session.use_cookies")) {
         $params['httponly']
     );
 }
-
-/*
- | Redirect to login page
- */
 header("Location: /login");
 exit;

@@ -1,4 +1,4 @@
-.navbar {
+.site-navbar {
     display: flex;
     justify-content: center;
     padding: 16px 40px;
@@ -13,20 +13,76 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    
+
 }
 
 .nav-links {
     display: flex;
     gap: 24px;
     list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
     text-decoration: none;
+    color: #4b5563;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover {
+    color: #2563eb;
+}
+
+.nav-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-logo:hover {
+    color: #111827;
 }
 
 .nav-actions {
     display: flex;
     gap: 12px;
     align-items: center;
+}
+
+.nav-btn-primary {
+    background: #2563eb;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.nav-btn-primary:hover {
+    background: #1e40af;
+    color: #ffffff;
+}
+
+.nav-btn-outline {
+    border: 1px solid #e5e7eb;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #0f172a;
+    transition: all 0.2s ease;
+}
+
+.nav-btn-outline:hover {
+    border-color: #2563eb;
+    color: #2563eb;
 }
 
 .nav-user {

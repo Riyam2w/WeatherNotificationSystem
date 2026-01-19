@@ -6,7 +6,7 @@
 
     <!-- Brand -->
     <div class="sidebar-brand">
-        <span class="brand-text">WeatherNotify</span>
+        <span class="brand-text">🌩 WeatherNotify</span>
     </div>
 
     <!-- Navigation -->
@@ -53,11 +53,11 @@
     <div class="sidebar-footer">
         <div class="user-info">
             <div class="avatar">
-                <?= strtoupper(substr($_SESSION['full_name'] ?? 'U', 0, 1)) ?>
+                <?= strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?>
             </div>
             <div>
                 <div class="user-name">
-                    <?= htmlspecialchars($_SESSION['full_name'] ?? 'User') ?>
+                    <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
                 </div>
                 <div class="user-plan">
                     <?= htmlspecialchars($_SESSION['plan_name'] ?? 'Free Plan') ?>

@@ -2,10 +2,22 @@
 
 <form id="createAlertForm" novalidate>
 
-    <div class="create-alert-header">
+    <div class="create-alert-header header-flex">
         <div>
             <h1>Create New Alert</h1>
             <p>Define where and what you want to monitor.</p>
+        </div>
+        <?php 
+            $limit = $features['max_alerts'] ?? 3;
+            $count = $alertCount ?? 0;
+            $isLimitReached = $count >= $limit;
+        ?>
+        <div class="alert-usage usage-badge">
+            <div class="usage-label">Plan Limit</div>
+            <div class="usage-value <?= $isLimitReached ? 'limit-reached' : 'safe' ?>">
+                <?= $count ?> / <?= $limit ?>
+            </div>
+            <div class="usage-sub">Alerts Used</div>
         </div>
     </div>
 
@@ -38,11 +50,11 @@
 
             <?php
             $conditions = [
-                'temperature'   => ['🌡', 'Temperature', 'Heat or Freeze'],
-                'precipitation' => ['💧', 'Precipitation', 'Rain or Snow'],
+                'temperature_above'   => ['🌡', 'Temperature Above', 'Heat or Freeze'],
+                'temperature_below'   => ['🌡', 'Temperature Below', 'Heat or Freeze'],
+                'rain' => ['💧', 'Rainfall', 'Rain intensity'],
                 'storm'         => ['🌩', 'Storm', 'Severe Weather'],
                 'wind'          => ['🌬', 'Wind Speed', 'High Winds'],
-                'uv'            => ['☀', 'UV Index', 'Sun Exposure'],
             ];
             foreach ($conditions as $key => [$icon, $title, $desc]): ?>
                 <button type="button"
@@ -78,7 +90,7 @@
                    class="input"
                    id="threshold"
                    name="threshold"
-                   disabled
+                   
                    required>
 
             <!-- <span class="unit"></span> -->
@@ -98,9 +110,14 @@
          Actions
     ======================= -->
     <div class="form-actions">
+        <?php if ($isLimitReached): ?>
+            <div class="alert alert-danger w-100 mb-3 alert-limit-msg">
+                <strong>Limit Reached:</strong> You have used all <?= $limit ?> alerts allowed in your plan. Please delete an existing alert or upgrade your plan to create more.
+            </div>
+        <?php endif; ?>
         <button type="submit"
-                class="btn btn-primary">
-            Next
+                class="btn btn-primary <?= $isLimitReached ? 'limit-reached' : '' ?>" <?= $isLimitReached ? 'disabled' : '' ?>>
+            <?= $isLimitReached ? 'Limit Reached' : 'Next' ?>
         </button>
     </div>
 

@@ -1,12 +1,15 @@
-/* =========================================================
-   AUTH PAGE BASE (ALL AUTH PAGES)
-========================================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
 .page-wrapper {
-    min-height: calc(100vh - 140px); /* navbar + footer height */
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 2rem;
 }
 
 .auth-wrapper {
@@ -14,19 +17,20 @@
     display: flex;
     justify-content: center;
 }
+
 /* =========================================================
    CARD (FORM CONTAINER)
 ========================================================= */
 
 .card {
     width: 100%;
-    max-width: 460px;
+    max-width: 420px;
 
-    padding: 48px;
+    padding: 2.5rem;
     background: #ffffff;
 
-    border-radius: 14px;
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 
     display: flex;
     flex-direction: column;
@@ -37,14 +41,16 @@
 ========================================================= */
 
 .card h2 {
-    font-size: 26px;
-    margin-bottom: 8px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #1e293b;
 }
 
 .card p {
-    font-size: 14px;
+    font-size: 0.9375rem;
     color: #64748b;
-    margin-bottom: 24px;
+    margin-bottom: 2rem;
 }
 
 /* =========================================================
@@ -57,31 +63,42 @@ form {
 
 label {
     display: block;
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 6px;
-    color: #334155;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #475569;
 }
 
 input[type="email"],
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+.password input {
     width: 100%;
-    padding: 12px 14px;
-    font-size: 14px;
+    height: 48px;
+    padding: 0 1rem;
+    font-size: 0.9375rem;
 
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    margin-bottom: 18px;
-
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
     background: #ffffff;
-    color: #0f172a;
-    transition: border-color 0.2s ease;
+    color: #1e293b;
+    transition: all 0.2s ease;
+}
+
+input[type="email"],
+input[type="text"]:not(.password input),
+.password {
+    margin-bottom: 1.25rem;
+}
+
+.password input {
+    margin-bottom: 0 !important;
 }
 
 input:focus {
     outline: none;
     border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 /* =========================================================
@@ -90,6 +107,8 @@ input:focus {
 
 .password {
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .password span {
@@ -108,6 +127,10 @@ input:focus {
 .forgot-password {
     text-align: right;
     margin-bottom: 24px;
+}
+
+.forgot-password.back-link-container {
+    margin-top: 16px;
 }
 
 .forgot-link {
@@ -153,6 +176,7 @@ button:hover {
     position: relative;
 
 }
+
 /* =========================================================
    AUTH PAGE SWITCH LINK
 ========================================================= */
@@ -187,11 +211,50 @@ button:hover {
 
 .field-error {
     display: block;
-    color: #dc2626;        /* red */
+    color: #dc2626;
     font-size: 12px;
     margin-top: 4px;
 }
 
 input.error {
     border-color: #dc2626;
+}
+
+/* Message styling */
+#messageBox {
+    margin-bottom: 1.5rem;
+}
+
+#messageBox .error,
+#messageBox .success {
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    font-weight: 500;
+    animation: slideDown 0.3s ease-out;
+}
+
+#messageBox .error {
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #991b1b;
+}
+
+#messageBox .success {
+    background: #f0fdf4;
+    border: 1px solid #dcfce7;
+    color: #166534;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

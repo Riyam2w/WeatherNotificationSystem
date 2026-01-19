@@ -41,16 +41,40 @@ class Router
     public function dispatch(): void
     {
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
 
         // ✅ REMOVE /public FROM URI IF PRESENT
         $uri = preg_replace('#^/public#', '', $uri);
         $uri = '/' . trim($uri, '/');
 
-        $route = $this->routes[$method][$uri] ?? null;
+        $matchedRoute = null;
+        $params = [];
 
-        if (!$route) {
+        // 1. Try Exact Match
+        if (isset($this->routes[$method][$uri])) {
+            $matchedRoute = $this->routes[$method][$uri];
+        } else {
+            // 2. Try Regex Match
+            foreach ($this->routes[$method] ?? [] as $routePath => $routeData) {
+                // Convert {id} to named group (?P<id>[^/]+)
+                $pattern = preg_replace('#\{([a-zA-Z0-9_]+)\}#', '(?P<\1>[^/]+)', $routePath);
+                $pattern = "#^" . $pattern . "$#";
+
+                if (preg_match($pattern, $uri, $matches)) {
+                    $matchedRoute = $routeData;
+                    
+                    // Filter out numeric keys from matches
+                    foreach ($matches as $key => $value) {
+                        if (is_string($key)) {
+                            $params[$key] = $value;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (!$matchedRoute) {
             http_response_code(404);
 
             if (
@@ -71,7 +95,7 @@ class Router
         // ==========================
         // MIDDLEWARE EXECUTION
         // ==========================
-        foreach ($route['middlewares'] as $middleware) {
+        foreach ($matchedRoute['middlewares'] as $middleware) {
             if (!class_exists($middleware)) {
                 throw new RuntimeException("Middleware {$middleware} not found");
             }
@@ -93,7 +117,7 @@ class Router
         // ==========================
         // CONTROLLER EXECUTION
         // ==========================
-        [$controller, $action] = explode('@', $route['handler'], 2);
+        [$controller, $action] = explode('@', $matchedRoute['handler'], 2);
 
         if (!class_exists($controller)) {
             throw new RuntimeException("Controller {$controller} not found");
@@ -109,6 +133,7 @@ class Router
             throw new RuntimeException("Method {$action} not found in {$controller}");
         }
 
-        $instance->$action();
+        // Pass params to the method
+        call_user_func_array([$instance, $action], $params);
     }
 }

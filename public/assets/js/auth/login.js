@@ -70,7 +70,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const formData = new FormData(form);
 
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.textContent;
+
         try {
+            // Block other actions (Disable button and show loading)
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in...';
+            messageBox.innerHTML = '';
+
             const response = await fetch('/login', {
                 method: 'POST',
                 body: formData,
@@ -84,8 +92,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
 
             if (!response.ok || !data.success) {
-                messageBox.innerHTML =
-                    `<div class="error">${data.error || 'Login failed'}</div>`;
+                const errorMessage = data.errors?.general || data.error || 'Login failed';
+                messageBox.innerHTML = `<div class="error">${errorMessage}</div>`;
+                //  checks for tags inside a div  
+
+                // Re-enable on error
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
                 return;
             }
 
@@ -94,6 +107,10 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (err) {
             messageBox.innerHTML =
                 `<div class="error">Network error. Please try again.</div>`;
+
+            // Re-enable on error
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
         }
     });
 });

@@ -15,7 +15,7 @@
             <span>Monthly</span>
             <label class="switch">
                 <input type="checkbox" id="billingToggle">
-                <span class="slider"></span>
+                <span class="slider round"></span>
             </label>
             <span>Yearly <strong class="save">SAVE 20%</strong></span>
         </div>
@@ -23,11 +23,6 @@
     <!-- SAME CARDS, REUSED -->
     <?php require __DIR__ . '/../partials/pricing-cards.php'; ?>
 </section>
-
-
-<!-- ===============================
- FULL PAGE ONLY CONTENT
-================================ -->
 
 <?php require __DIR__ . '/../partials/compare-table.php'; ?>
 <!-- <?php require __DIR__ . '/../partials/faq.php'; ?> -->

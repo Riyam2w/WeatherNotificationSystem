@@ -13,10 +13,6 @@ class AuthController extends Controller
         $this->conn = $conn;
     }
 
-    /* ==========================
-       SHOW PAGES (GET)
-    ========================== */
-
     public function showRegister(): void
     {
         $this->view('Auth/register', [
@@ -31,16 +27,6 @@ class AuthController extends Controller
         ]);
     }
 
-    public function showForgotPassword(): void
-    {
-        $this->view('Auth/forget_password', [
-            'title' => 'Forgot Password'
-        ]);
-    }
-
-    /* ==========================
-       REGISTER (POST – AJAX)
-    ========================== */
 
     public function register(): void
     {
@@ -88,7 +74,6 @@ class AuthController extends Controller
             return;
         }
         
-        // $stmt->execute();
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
@@ -156,8 +141,13 @@ class AuthController extends Controller
         $result = $stmt->get_result();
         $user   = $result->fetch_assoc();
 
-        if (!$user || !password_verify($password, $user['password_hash'])) {
-            $this->jsonError('Invalid credentials', 401);
+        if (!$user) {
+            $this->jsonError('No account found with this email.', 401);
+            return;
+        }
+
+        if (!password_verify($password, $user['password_hash'])) {
+            $this->jsonError('Incorrect password. Please try again.', 401);
             return;
         }
 
@@ -185,25 +175,19 @@ class AuthController extends Controller
         session_unset();
         session_destroy();
 
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success'  => true,
-            'redirect' => '/login'
-        ]);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true]);
+            exit;
+        }
+
+        header('Location: /login');
         exit;
     }
 
     /* ==========================
        HELPERS
     ========================== */
-
-    private function ensurePost(): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->jsonError('Method not allowed', 405);
-            exit;
-        }
-    }
 
     private function jsonHeader(): void
     {

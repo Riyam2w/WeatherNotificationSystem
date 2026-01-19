@@ -2,10 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('registerForm');
     if (!form) return;
 
-    const nameField     = document.getElementById('full_name');
-    const emailField    = document.getElementById('email');
+    const nameField = document.getElementById('full_name');
+    const emailField = document.getElementById('email');
     const passwordField = document.getElementById('password');
-    const confirmField  = document.getElementById('confirm_password');
+    const confirmField = document.getElementById('confirm_password');
 
     /* =========================
        Password Toggle
@@ -82,9 +82,15 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         if (!validateForm()) return;
 
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.textContent;
         const formData = new FormData(form);
 
         try {
+            // Block other actions
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating Account...';
+
             const response = await fetch('/register', {
                 method: 'POST',
                 body: formData,
@@ -93,14 +99,37 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const text = await response.text();
-            const data = text ? JSON.parse(text) : {};
+            let data = {};
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (e) {
+                console.error("Failed to parse JSON", text);
+            }
 
             if (!response.ok || data.success === false) {
                 if (data.errors) {
                     Object.entries(data.errors).forEach(([field, msg]) =>
                         showError(field, msg)
                     );
+                } else if (data.error) {
+                    const messageBox = document.getElementById('messageBox');
+                    if (messageBox) messageBox.innerHTML = `<div class="error">${data.error}</div>`;
                 }
+
+                // Re-enable
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+                return;
+            }
+
+            if (data.success) {
+                const messageBox = document.getElementById('messageBox');
+                if (messageBox) {
+                    messageBox.innerHTML = `<div class="success">${data.message || 'Registration successful. Redirecting...'}</div>`;
+                }
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1500);
                 return;
             }
 
@@ -108,6 +137,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (err) {
             console.error('Registration failed:', err);
+            // Re-enable
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
         }
     });
 });

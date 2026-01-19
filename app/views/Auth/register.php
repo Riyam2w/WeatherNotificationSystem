@@ -17,7 +17,7 @@
         <h2>Create your account</h2>
         <p>Start receiving real-time weather alerts today.</p>
 
-        <!-- <div id="formMessage"></div> -->
+        <div id="messageBox"></div>
 
         <form id="registerForm" novalidate>
 

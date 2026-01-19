@@ -11,7 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'POST',
                     credentials: 'same-origin',
                     headers: {
-                        'X-CSRF-TOKEN': csrfToken
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
 
@@ -20,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.location.href = '/login';
                 }
             } catch (e) {
-                alert('Logout failed. Please try again.');
+                Toast.error('Logout failed. Please try again.');
             }
         });
     }

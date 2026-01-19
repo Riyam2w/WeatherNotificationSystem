@@ -16,6 +16,8 @@
         <h2>Welcome back</h2>
         <p>Please enter your details to sign in.</p>
 
+        <div id="messageBox"></div>
+
         <form id="loginForm" novalidate>
 
             <label>Email Address</label>
@@ -26,11 +28,6 @@
                 <input type="password" name="password" id="password-field" required>
                 <span id="togglePassword" class="fa fa-eye-slash"></span>
             </div>
-
-            <div class="forgot-password">
-                <a href="/forget_password" class="forgot-link">Forgot Password?</a>
-            </div>
-
             <button type="submit">Sign in</button>
 
             <p class="auth-switch">

@@ -59,6 +59,19 @@ section {
     align-items: center;
 }
 
+.hero-text .brand-tile {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #eef5ff;
+    color: var(--primary);
+    border-radius: 999px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+}
+
 .hero-text h1 {
     font-size: 3.2rem;
     line-height: 1.15;

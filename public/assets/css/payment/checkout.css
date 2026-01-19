@@ -1,0 +1,189 @@
+/* ===============================
+   CHECKOUT PAGE STYLES
+================================ */
+
+.checkout-container {
+    padding: 80px 20px;
+    background: #f9fafb;
+    min-height: calc(100vh - 160px);
+}
+
+.checkout-card {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.checkout-info {
+    flex: 1;
+    padding: 40px;
+    border-right: 1px solid #e5e7eb;
+}
+
+.checkout-form-section {
+    flex: 1;
+    padding: 40px;
+    background: #fdfdfd;
+}
+
+@media (max-width: 768px) {
+    .checkout-info {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+    }
+}
+
+.checkout-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: #111827;
+}
+
+.plan-summary {
+    background: #f3f4f6;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.plan-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.plan-price {
+    font-size: 32px;
+    font-weight: 800;
+    color: #2563eb;
+}
+
+.plan-price span {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.feature-check-list {
+    list-style: none;
+    padding: 0;
+    margin: 24px 0 0;
+}
+
+.feature-check-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: #4b5563;
+    margin-bottom: 12px;
+}
+
+.feature-check-list li i {
+    color: #22c55e;
+}
+
+/* ===============================
+   BILLING CYCLE TOGGLE
+================================ */
+
+.billing-cycle-selector {
+    margin-bottom: 32px;
+}
+
+.cycle-options {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.cycle-option {
+    flex: 1;
+    position: relative;
+    cursor: pointer;
+}
+
+.cycle-option input {
+    position: absolute;
+    opacity: 0;
+}
+
+.cycle-box {
+    padding: 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.cycle-option input:checked+.cycle-box {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.cycle-name {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+}
+
+.cycle-save {
+    font-size: 11px;
+    color: #22c55e;
+    font-weight: 700;
+}
+
+/* ===============================
+   PAYMENT STATUS
+================================ */
+
+#payment-status {
+    text-align: center;
+    padding: 20px;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+}
+
+.btn-pay {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-pay:hover {
+    background: #1e40af;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.secure-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 24px;
+}

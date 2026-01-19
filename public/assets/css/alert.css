@@ -139,8 +139,8 @@
 
 .create-alert-page {
     max-width: 760px;
-      margin: 0 auto; 
-        margin-top: 40px; 
+    margin: 0 auto;
+    margin-top: 40px;
 }
 
 .create-alert-header {
@@ -270,7 +270,8 @@
 /* Individual select styling */
 .location-select {
     flex: 1;
-    min-width: 0; /* important for flex */
+    min-width: 0;
+    /* important for flex */
     appearance: none;
     background-color: #fff;
     cursor: pointer;
@@ -521,4 +522,63 @@
 .autocomplete-list {
     position: relative;
     z-index: 20;
+}
+
+/* =========================================================
+   DASHBOARD UTILITIES (Replacing Inline Styles)
+   ========================================================= */
+
+.usage-badge {
+    text-align: right;
+    background: #f3f4f6;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+}
+
+.usage-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.usage-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.usage-sub {
+    font-size: 0.7rem;
+    color: #6b7280;
+}
+
+.usage-value.limit-reached {
+    color: #ef4444;
+}
+
+.usage-value.safe {
+    color: #111827;
+}
+
+.header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.alert-limit-msg {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+}
+
+.btn:disabled.limit-reached {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.d-none {
+    display: none !important;
 }

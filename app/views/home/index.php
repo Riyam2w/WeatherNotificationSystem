@@ -10,6 +10,9 @@ declare(strict_types=1);
     <div class="hero-content">
 
         <div class="hero-text">
+            <div class="brand-tile">
+                <span>🌩</span> WeatherNotify
+            </div>
             <h1>
                 Get Weather Alerts <br>
                 <span class="highlight">Before It Happens</span>
@@ -53,6 +56,15 @@ declare(strict_types=1);
     <div class="section-header">
         <h2>Pricing Plans</h2>
         <p>Choose the plan that works for you.</p>
+
+        <div class="billing-toggle">
+            <span>Monthly</span>
+            <label class="switch">
+                <input type="checkbox" id="billingToggle">
+                <span class="slider round"></span>
+            </label>
+            <span>Yearly <strong class="save" style="color: #22c55e; font-size: 0.8em; margin-left: 5px;">SAVE 20%</strong></span>
+        </div>
     </div>
 
     <?php require __DIR__ . '/../partials/pricing-cards.php'; ?>

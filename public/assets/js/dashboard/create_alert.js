@@ -1,40 +1,41 @@
 const CONDITION_CONFIG = {
-    temperature: {
+    temperature_above: {
         label: "Temperature",
+        operators: [">"],
         units: ["°C", "°F"],
-        defaultUnit: "°C",
         step: 0.1,
-        default: 30,
-        operators: [">", "<"]
+        default: 30
     },
-    precipitation: {
-        label: "Precipitation",
+    temperature_below: {
+        label: "Temperature",
+        operators: ["<"],
+        units: ["°C", "°F"],
+        step: 0.1,
+        default: 0
+    },
+
+    rain: {
+        label: "Rainfall",
+        operators: [">", "<"],
         units: ["mm"],
         step: 1,
-        default: 40,
-        operators: [">"]
+        default: 40
     },
     wind: {
         label: "Wind Speed",
-        units: ["km/h"],
+        operators: [">", "<"],
+        units: ["km/h", "mph"],
         step: 1,
-        default: 40,
-        operators: [">"]
+        default: 60
     },
     storm: {
-        label: "Storm Severity",
-        units: ["level"],
+        label: "Storm",
+        operators: [">"],
+        units: ["Severity Level"],
         step: 1,
-        default: 1,
-        operators: [">"]
-    },
-    uv: {
-        label: "UV Index",
-        units: ["index"],
-        step: 1,
-        default: 6,
-        operators: [">"]
+        default: 3
     }
+
 };
 
 function initCreateAlertUI() {
@@ -43,34 +44,88 @@ function initCreateAlertUI() {
     if (!form || form.dataset.bound === "true") return;
     form.dataset.bound = "true";
 
+    const cityInput = document.getElementById("citySearch");
+    const cityResults = document.getElementById("cityResults");
+    const cityNameInput = document.getElementById("city_name");
+    const latInput = document.getElementById("lat");
+    const lonInput = document.getElementById("lon");
+
     const conditionInput = document.getElementById("condition_type");
     const thresholdInput = document.getElementById("threshold");
     const operatorSelect = document.getElementById("operator");
-    const unitSelect     = document.getElementById("unit");
-    const summary        = document.getElementById("conditionSummary");
+    const unitSelect = document.getElementById("unit");
+    const summary = document.getElementById("conditionSummary");
 
-    thresholdInput.disabled = true;
+    thresholdInput.readOnly = true;
     operatorSelect.disabled = true;
     unitSelect.style.display = "none";
 
+    function selectCity(city) {
+        cityNameInput.value = city.name;
+        latInput.value = city.lat;
+        lonInput.value = city.lon;
+        cityInput.value = city.name;
+        cityResults.innerHTML = "";
+    }
+
+    /* ================== CITY AUTOCOMPLETE ================== */
+
+    const OPENWEATHER_API_KEY = "c4e6dd84573d65a9b87404115c759ee7";
+    let citySearchTimeout = null;
+
+    cityInput.addEventListener("input", () => {
+        const query = cityInput.value.trim();
+
+        cityNameInput.value = "";
+        latInput.value = "";
+        lonInput.value = "";
+        cityResults.innerHTML = "";
+
+        if (query.length < 3) return;
+
+        clearTimeout(citySearchTimeout);
+
+        citySearchTimeout = setTimeout(async () => {
+            try {
+                const res = await fetch(
+                    `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${OPENWEATHER_API_KEY}`
+                );
+
+                const cities = await res.json();
+                cityResults.innerHTML = "";
+
+                if (!Array.isArray(cities)) return;
+
+                cities.forEach(city => {
+                    const li = document.createElement("li");
+                    li.className = "autocomplete-item";
+                    li.textContent =
+                        `${city.name}${city.state ? ", " + city.state : ""}, ${city.country}`;
+
+                    li.addEventListener("click", () => {
+                        selectCity({ name: city.name, lat: city.lat, lon: city.lon });
+                    });
+
+                    cityResults.appendChild(li);
+                });
+
+            } catch (err) {
+                console.error("City search failed", err);
+            }
+        }, 300);
+    });
+
+    /* ================== CONDITION SELECTION ================== */
+
     document.querySelectorAll(".condition-card").forEach(card => {
         card.addEventListener("click", () => {
-
-            document.querySelectorAll(".condition-card").forEach(c => {
-                c.classList.remove("active");
-                c.setAttribute("aria-pressed", "false");
-            });
-
+            document.querySelectorAll(".condition-card").forEach(c => c.classList.remove("active"));
             card.classList.add("active");
-            card.setAttribute("aria-pressed", "true");
 
             const condition = card.dataset.condition;
             const config = CONDITION_CONFIG[condition];
-
             conditionInput.value = condition;
-            thresholdInput.disabled = true;
 
-            /* ---------- Operator ---------- */
             operatorSelect.innerHTML = "";
             config.operators.forEach(op => {
                 const option = document.createElement("option");
@@ -79,14 +134,8 @@ function initCreateAlertUI() {
                 operatorSelect.appendChild(option);
             });
 
-            if (config.operators.length === 1) {
-                operatorSelect.value = config.operators[0];
-                operatorSelect.disabled = true;
-            } else {
-                operatorSelect.disabled = false;
-            }
+            operatorSelect.disabled = false;
 
-            /* ---------- Unit ---------- */
             unitSelect.innerHTML = "";
             config.units.forEach(unit => {
                 const option = document.createElement("option");
@@ -96,39 +145,46 @@ function initCreateAlertUI() {
             });
 
             unitSelect.style.display = "inline-block";
-            unitSelect.value = config.defaultUnit || config.units[0];
-
-            /* ---------- Threshold ---------- */
-            thresholdInput.step  = config.step;
+            thresholdInput.step = config.step;
             thresholdInput.value = config.default;
+            thresholdInput.readOnly = false;
 
-            /* ---------- Summary ---------- */
-            if (summary) {
-                summary.innerHTML =
-                    `Alert when <strong>${config.label}</strong> is ${operatorSelect.value} threshold`;
-            }
+            summary.innerHTML = `Alert when <strong>${config.label}</strong> is ${operatorSelect.value} ${thresholdInput.value} ${unitSelect.value}`;
         });
     });
 
+    /* ================== SUBMIT ================== */
+
     form.addEventListener("submit", e => {
+        e.preventDefault();
 
-        const required = ["city_name", "lat", "lon"];
-        for (const field of required) {
-            if (!form[field] || form[field].value === "") {
-                e.preventDefault();
-                alert("Please select a valid city first.");
-                return;
-            }
+        if (!cityNameInput.value || !conditionInput.value) {
+            Toast.warning("Please select a city and condition.");
+            return;
         }
 
-        if (
-            !conditionInput.value ||
-            !thresholdInput.value ||
-            !operatorSelect.value ||
-            !unitSelect.value
-        ) {
-            e.preventDefault();
-            alert("Please complete all alert fields.");
-        }
+        const draft = {
+            city_name: cityNameInput.value,
+            lat: latInput.value,
+            lon: lonInput.value,
+            condition_type: conditionInput.value,
+            operator: operatorSelect.value,
+            threshold: thresholdInput.value,
+            unit: unitSelect.value
+        };
+
+        sessionStorage.setItem("alertDraft", JSON.stringify(draft));
+
+        // Load confirm page via dashboard loader
+        fetch('/dashboard/load?page=create-alert-confirm', { credentials: 'same-origin' })
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById("dashboard-content").innerHTML = html;
+                if (window.initCreateAlertConfirm) {
+                    window.initCreateAlertConfirm();
+                }
+            });
     });
-}   
+}
+
+window.initCreateAlertUI = initCreateAlertUI;

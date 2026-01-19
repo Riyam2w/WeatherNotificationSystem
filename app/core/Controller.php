@@ -35,4 +35,21 @@ abstract class Controller
 
         require $layoutFile;
     }
+
+    protected function ensurePost(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo 'Method Not Allowed';
+            exit;
+        }
+    }
+
+    protected function json(array $data, int $code = 200): void
+    {
+        http_response_code($code);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
+    }
 }

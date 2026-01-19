@@ -10,9 +10,6 @@ class DashboardController extends Controller
         $this->conn = $conn;
     }
 
-    /**
-     * Loads the main dashboard shell
-     */
     public function index(): void
     {
         $activePage = $_GET['page'] ?? 'overview';
@@ -41,6 +38,7 @@ class DashboardController extends Controller
             'create-alert-confirm' => 'dashboard/pages/create_alert_confirm',
             'subscriptions'        => 'dashboard/pages/subscriptions',
             'settings'             => 'dashboard/pages/settings',
+            'history'              => 'dashboard/pages/history',
         ];
 
         if (!isset($pages[$page])) {
@@ -55,6 +53,62 @@ class DashboardController extends Controller
 
             $stats = new DashboardStats($this->conn);
             $data = $stats->getOverviewStats((int)$_SESSION['user_id']);
+
+        }
+        
+        if ($page === 'create-alert') {
+            require_once __DIR__ . '/../models/Subscription.php';
+            require_once __DIR__ . '/../models/Alert.php';
+            $subModel = new Subscription($this->conn);
+            $alertModel = new Alert($this->conn);
+            $userId = (int)($_SESSION['user_id'] ?? 0);
+            
+            $data['features'] = $subModel->getFeaturesForUser($userId);
+            $data['alertCount'] = $alertModel->countAll($userId);
+        }
+        
+
+        
+        if ($page === 'alerts') {
+            require_once __DIR__ . '/../models/Alert.php';
+            require_once __DIR__ . '/../models/Subscription.php';
+            
+            $alertModel = new Alert($this->conn);
+            $subModel = new Subscription($this->conn);
+            $userId = (int)($_SESSION['user_id'] ?? 0);
+            
+            $data['alerts'] = $alertModel->all($userId);
+            $data['features'] = $subModel->getFeaturesForUser($userId);
+            $data['currentAlertCount'] = count($data['alerts']);
+        }
+
+        if ($page === 'subscriptions') {
+            require_once __DIR__ . '/../models/Plan.php';
+            require_once __DIR__ . '/../models/Subscription.php';
+            require_once __DIR__ . '/../models/Payment.php';
+
+            $planModel = new Plan($this->conn);
+            $subscriptionModel = new Subscription($this->conn);
+            $paymentModel = new Payment($this->conn);
+            $userId = (int)($_SESSION['user_id'] ?? 0);
+
+            $data['plans'] = $planModel->getPlansWithFeatures();
+            $data['currentSubscription'] = $subscriptionModel->current($userId);
+            $data['billingHistory'] = $paymentModel->getHistory($userId);
+        }
+
+        if ($page === 'history') {
+            require_once __DIR__ . '/../models/Activity.php';
+            $activityModel = new Activity($this->conn);
+            $userId = (int)($_SESSION['user_id'] ?? 0);
+            $data['activities'] = $activityModel->getHistory($userId);
+        }
+
+        if ($page === 'settings') {
+            require_once __DIR__ . '/../models/User.php';
+            $userModel = new User($this->conn);
+            $userId = (int)($_SESSION['user_id'] ?? 0);
+            $data['user'] = $userModel->find($userId);
         }
 
         // ✅ Render partial WITHOUT layout
